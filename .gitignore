@@ -4,3 +4,6 @@
 
 /bin
 /obj
+*.v2
+*.v1
+.vs/Meta/v17/.suo
