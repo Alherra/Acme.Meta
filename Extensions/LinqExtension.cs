@@ -1,75 +1,145 @@
 ﻿using Meta;
-using System;
-using System.Collections.Generic;
+using Newtonsoft.Json;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace System.Linq
 {
     /// <summary>
-    /// Linq扩展方法
+    /// Linq Extension Functions.
     /// </summary>
-    [Description("Linq扩展方法")]
+    [Description("Linq-Extension")]
     public static class LinqExtension
     {
         /// <summary>
-        /// 分页
+        /// Returns an instance of the target class and make the same field-values.
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="source">源</param>
-        /// <param name="SkipCount">页码</param>
-        /// <param name="PageSize">页条数</param>
+        /// <typeparam name="Target">The target type.</typeparam>
+        /// <param name="source">The source data.</param>
         /// <returns></returns>
-        [Description("分页扩展")]
-        public static PagedResult<T> ToPageList<T>(this IEnumerable<T> source, int SkipCount, int PageSize)
-        {
-            if (SkipCount <= 0) SkipCount = 1;
-            if (PageSize <= 0) PageSize = 10;
+        public static Target MapTo<Target>(this object source) => Activator.CreateInstance<Target>().MapFrom(source);
 
-            var result = source
-                .Skip((SkipCount - 1) * PageSize)
-                .Take(PageSize);
-            return new PagedResult<T>(source.Count(), result.ToList());
+        /// <summary>
+        /// Returns and set field-values from an object.
+        /// </summary>
+        /// <typeparam name="Target">The target type.</typeparam>
+        /// <param name="target">The original object.</param>
+        /// <param name="source">The source data.</param>
+        /// <returns></returns>
+        public static Target MapFrom<Target>(this Target target, object source) => Mapper(source, target);
+
+        /// <summary>
+        /// Return the field-values mapped object from one to another.
+        /// </summary>
+        /// <typeparam name="Source">The source type.</typeparam>
+        /// <typeparam name="Target">The target type.</typeparam>
+        /// <param name="source">The source data.</param>
+        /// <param name="target">The original object.</param>
+        /// <returns></returns>
+        private static Target Mapper<Source, Target>(Source source, Target target)
+        {
+            if (typeof(Source) == typeof(Target))
+                return JsonConvert.DeserializeObject<Target>(JsonConvert.SerializeObject(source))!;
+
+            if (target is null)
+                target = Activator.CreateInstance<Target>();
+
+            if(source is null)
+                return target;
+
+            var sourceType = source.GetType();
+
+            foreach (var property in target!.GetType().GetProperties().Where(p => p.CanWrite))
+            {
+                var sourceProperty = sourceType.GetProperty(property.Name);
+                if (sourceProperty is null) continue;
+
+                try
+                {
+                    var value = sourceProperty.GetValue(source);
+
+                    var propertyType = property.PropertyType;
+                    if (propertyType == sourceProperty)
+                    {
+                        property.SetValue(target, value);
+                        continue;
+                    }
+
+                    if (value is null)
+                    {
+                        property.SetValue(target, propertyType.Name.StartsWith("Nullable") ? null : default);
+                        continue;
+                    }
+
+                    if (!propertyType.IsValueType && propertyType == typeof(Nullable<>) && propertyType.GenericTypeArguments.Any())
+                        propertyType = property.PropertyType.GenericTypeArguments[0];
+
+                    property.SetValue(target, Convert.ChangeType(value, propertyType));
+                }
+                catch { continue; }
+            }
+            return target;
         }
 
         /// <summary>
-        /// 分页
+        /// Returns a paged reuslt.
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="source">源</param>
-        /// <param name="input">分页参数</param>
+        /// <typeparam name="T">Any data type.</typeparam>
+        /// <param name="source">The list to be paged by.</param>
+        /// <param name="input">The paged by input data.</param>
         /// <returns></returns>
-        [Description("分页扩展")]
+        [Description("Paged-Extension")]
         public static PagedResult<T> ToPageList<T>(this IEnumerable<T> source, PagedInput input)
         {
-            if (input.SkipCount <= 0) input.SkipCount = 1;
+            if (input.PageNum <= 0) input.PageNum = 1;
             if (input.PageSize <= 0) input.PageSize = 10;
 
             var result = source
-                .Skip((input.SkipCount - 1) * input.PageSize)
+                .Skip((input.PageNum - 1) * input.PageSize)
                 .Take(input.PageSize);
             return new PagedResult<T>(source.Count(), result.ToList());
         }
 
         /// <summary>
-        /// 分页
+        /// Returns paged reuslt.
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="source">源</param>
-        /// <param name="SkipCount">页码</param>
-        /// <param name="PageSize">页条数</param>
+        /// <typeparam name="T">Any data type.</typeparam>
+        /// <param name="source">The list to be paged by.</param>
+        /// <param name="pageNum">The index num of the page.</param>
+        /// <param name="pageSize">The size num of the page.</param>
         /// <returns></returns>
-        [Description("分页扩展")]
-        public static PagedResult<T> ToPageList<T>(this IEnumerable<object> source, int SkipCount, int PageSize)
+        [Description("Paged-Extension")]
+        public static PagedResult<T> ToPageList<T>(this IEnumerable<T> source, int pageNum, int pageSize)
         {
-            if (SkipCount <= 0) SkipCount = 1;
-            if (PageSize <= 0) PageSize = 10;
+            if (pageNum <= 0) pageNum = 1;
+            if (pageSize <= 0) pageSize = 10;
 
             var result = source
-                .Skip((SkipCount - 1) * PageSize)
-                .Take(PageSize);
+                .Skip((pageNum - 1) * pageSize)
+                .Take(pageSize);
+            return new PagedResult<T>(source.Count(), result.ToList());
+        }
+
+        /// <summary>
+        /// Returns paged reuslt.
+        /// </summary>
+        /// <typeparam name="T">Any data type.</typeparam>
+        /// <param name="source">The list to be paged by.</param>
+        /// <param name="pageNum">The index num of the page.</param>
+        /// <param name="pageSize">The size num of the page.</param>
+        /// <returns></returns>
+        [Description("Paged-Extension")]
+        public static PagedResult<T> ToPageList<T>(this IEnumerable<object> source, int pageNum, int pageSize)
+        {
+            if (pageNum <= 0) pageNum = 1;
+            if (pageSize <= 0) pageSize = 10;
+
+            var result = source
+                .Skip((pageNum - 1) * pageSize)
+                .Take(pageSize);
+
+            if (typeof(T) == source.GetType().GenericTypeArguments[0])
+                return new PagedResult<T>(source.Count(), result.Select(x => (T)x).ToList());
+
             return new PagedResult<T>(source.Count(), result.Select(x => x.MapTo<T>()).ToList());
         }
     }

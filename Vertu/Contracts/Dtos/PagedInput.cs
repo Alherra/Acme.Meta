@@ -8,24 +8,24 @@ using System.Threading.Tasks;
 namespace Meta
 {
     /// <summary>
-    /// 分页参数
+    /// Paged by input object.
     /// </summary>
-    [DisplayName("分页参数")]
-    [Description("分页参数")]
+    [DisplayName("PagedByObject")]
+    [Description("PagedByObject")]
     public abstract class PagedInput
     {
         /// <summary>
-        /// 跳转页码
+        /// The index number of the page.
         /// </summary>
-        [DisplayName("跳转页码")]
-        [Description("跳转页码")]
-        public virtual int SkipCount { get; set; }
+        [DisplayName("Page-Number")]
+        [Description("Page-Number")]
+        public virtual int PageNum { get; set; }
 
         /// <summary>
-        /// 页条数
+        /// The size number of the page.
         /// </summary>
-        [DisplayName("页条数")]
-        [Description("页条数")]
+        [DisplayName("Page-Size")]
+        [Description("Page-Size")]
         public virtual int PageSize { get; set; }
     }
 }

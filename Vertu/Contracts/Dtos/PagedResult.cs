@@ -8,17 +8,17 @@ using System.Threading.Tasks;
 namespace System
 {
     /// <summary>
-    /// 分页查询结果
+    /// Paged result object.
     /// </summary>
-    /// <typeparam name="T"></typeparam>
-    [Description("分页查询结果")]
+    /// <typeparam name="T">Data class type.</typeparam>
+    [Description("Paged-Result")]
     public class PagedResult<T>
     {
         /// <summary>
         /// Total count of Items
         /// </summary>
-        [Description("总数量")]
-        public long TotalCount
+        [Description("List-Count")]
+        public virtual long Count
         {
             get;
             set;
@@ -27,30 +27,22 @@ namespace System
         /// <summary>
         /// List of items in current page
         /// </summary>
-        [Description("分页列表")]
-        public IReadOnlyList<T> Items
+        [Description("List-Items")]
+        public virtual IReadOnlyList<T> Items
         {
             get;
             set;
         }
 
         /// <summary>
-        /// Creates a new Volo.Abp.Application.Dtos.PagedResultDto`1 object.
+        /// Creates a new PagedResultDto`1 object.
         /// </summary>
-        [Description("分页查询结果")]
-        public PagedResult()
-        {
-        }
-
-        /// <summary>
-        /// Creates a new Volo.Abp.Application.Dtos.PagedResultDto`1 object.
-        /// </summary>
-        /// <param name="totalCount">Total count of Items</param>
+        /// <param name="count">Total count of Items</param>
         /// <param name="items">List of items in current page</param>
-        [Description("分页查询结果")]
-        public PagedResult(long totalCount, IReadOnlyList<T> items)
+        [Description("Paged-Result")]
+        public PagedResult(long count, IReadOnlyList<T> items)
         {
-            TotalCount = totalCount;
+            Count = count;
             Items = items;
         }
     }
