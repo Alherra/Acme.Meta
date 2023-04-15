@@ -1,7 +1,7 @@
 ﻿
 using System.ComponentModel;
 
-namespace Meta
+namespace System
 {
     /// <summary>
     /// An attribute that create injection for a type class.

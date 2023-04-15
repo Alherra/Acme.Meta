@@ -1,14 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 
-namespace Meta
+namespace System
 {
     /// <summary>
     /// ApiControllerBase
     /// </summary>
     [ApiController]
     [Route("[controller]/[action]")]
-    public abstract class ApiMetaController : MetaController
-    {
-    }
+    public abstract class WebAPI : Meta.MetaController { }
 }

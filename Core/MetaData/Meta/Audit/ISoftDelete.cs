@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Meta.Meta.Audit
+namespace System
 {
     /// <summary>
     /// Used to standardize soft deleting entities. Soft-delete entities are not actually

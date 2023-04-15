@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Text;
 
-namespace Meta
+namespace System
 {
     /// <summary>
     /// 应用配置

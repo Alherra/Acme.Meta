@@ -1,7 +1,4 @@
-﻿using Meta.Core.Enums;
-using Meta.Tools;
-using Microsoft.AspNetCore.Http;
-//using Microsoft.AspNetCore.Authentication.Cookies;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
@@ -13,7 +10,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace Meta
+namespace System
 {
     /// <summary>
     /// 请求过滤

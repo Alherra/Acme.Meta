@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Meta.Filters
+namespace System.Filters
 {
     /// <summary>
     /// 数据事务自动过滤

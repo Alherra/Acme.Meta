@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Meta.Account
+namespace System.Account
 {
     /// <summary>
     /// 控制方法接口

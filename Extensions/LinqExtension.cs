@@ -43,18 +43,20 @@ namespace System.Linq
             if (target is null)
                 target = Activator.CreateInstance<Target>();
 
-            if(source is null)
+            if (source is null)
                 return target;
 
-            var sourceType = source.GetType();
+            var sourceProperties = source.GetType().GetProperties().ToDictionary(p => p.Name, p => p);
 
-            foreach (var property in target!.GetType().GetProperties().Where(p => p.CanWrite))
+            foreach (var property in target!
+                .GetType()
+                .GetProperties()
+                .Where(p => p.CanWrite && sourceProperties.ContainsKey(p.Name)))
             {
-                var sourceProperty = sourceType.GetProperty(property.Name);
-                if (sourceProperty is null) continue;
 
                 try
                 {
+                    var sourceProperty = sourceProperties[property.Name];
                     var value = sourceProperty.GetValue(source);
 
                     var propertyType = property.PropertyType;
@@ -66,7 +68,7 @@ namespace System.Linq
 
                     if (value is null)
                     {
-                        property.SetValue(target, propertyType.Name.StartsWith("Nullable") ? null : default);
+                        property.SetValue(target, propertyType == typeof(Nullable<>) ? null : default);
                         continue;
                     }
 

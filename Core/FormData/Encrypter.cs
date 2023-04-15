@@ -6,7 +6,7 @@ using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace Meta
+namespace System
 {
     public class Encrypter
     {
@@ -50,23 +50,21 @@ namespace Meta
         public static string EncryptMD5(string Text, string sKey)
         {
 #pragma warning disable SYSLIB0021 // 类型或成员已过时
-            using (DESCryptoServiceProvider des = new DESCryptoServiceProvider())
+            using DESCryptoServiceProvider des = new();
+            byte[] inputByteArray;
+            inputByteArray = Encoding.Default.GetBytes(Text);
+            des.Key = ASCIIEncoding.ASCII.GetBytes(Md5Hash(sKey).Substring(0, 8));
+            des.IV = ASCIIEncoding.ASCII.GetBytes(Md5Hash(sKey).Substring(0, 8));
+            System.IO.MemoryStream ms = new();
+            CryptoStream cs = new(ms, des.CreateEncryptor(), CryptoStreamMode.Write);
+            cs.Write(inputByteArray, 0, inputByteArray.Length);
+            cs.FlushFinalBlock();
+            StringBuilder ret = new StringBuilder();
+            foreach (byte b in ms.ToArray())
             {
-                byte[] inputByteArray;
-                inputByteArray = Encoding.Default.GetBytes(Text);
-                des.Key = ASCIIEncoding.ASCII.GetBytes(Md5Hash(sKey).Substring(0, 8));
-                des.IV = ASCIIEncoding.ASCII.GetBytes(Md5Hash(sKey).Substring(0, 8));
-                System.IO.MemoryStream ms = new System.IO.MemoryStream();
-                CryptoStream cs = new CryptoStream(ms, des.CreateEncryptor(), CryptoStreamMode.Write);
-                cs.Write(inputByteArray, 0, inputByteArray.Length);
-                cs.FlushFinalBlock();
-                StringBuilder ret = new StringBuilder();
-                foreach (byte b in ms.ToArray())
-                {
-                    ret.AppendFormat("{0:X2}", b);
-                }
-                return ret.ToString();
+                ret.AppendFormat("{0:X2}", b);
             }
+            return ret.ToString();
 #pragma warning restore SYSLIB0021 // 类型或成员已过时
         }
 
@@ -82,28 +80,26 @@ namespace Meta
             try
             {
 #pragma warning disable SYSLIB0021 // 类型或成员已过时
-                using (DESCryptoServiceProvider des = new DESCryptoServiceProvider())
+                using DESCryptoServiceProvider des = new();
+                int len;
+                len = Text.Length / 2;
+                byte[] inputByteArray = new byte[len];
+                int x, i;
+                for (x = 0; x < len; x++)
                 {
-                    int len;
-                    len = Text.Length / 2;
-                    byte[] inputByteArray = new byte[len];
-                    int x, i;
-                    for (x = 0; x < len; x++)
-                    {
-                        i = Convert.ToInt32(Text.Substring(x * 2, 2), 16);
-                        inputByteArray[x] = (byte)i;
-                    }
-
-                    //参数str类型是string
-                    // 注：.NET Core 不支持System.Web.Security.FormsAuthentication.HashPasswordForStoringInConfigFile(str, "MD5");轉為函數Md5Hash(string input)
-                    des.Key = ASCIIEncoding.ASCII.GetBytes(Md5Hash(sKey).Substring(0, 8));
-                    des.IV = ASCIIEncoding.ASCII.GetBytes(Md5Hash(sKey).Substring(0, 8));
-                    System.IO.MemoryStream ms = new System.IO.MemoryStream();
-                    CryptoStream cs = new CryptoStream(ms, des.CreateDecryptor(), CryptoStreamMode.Write);
-                    cs.Write(inputByteArray, 0, inputByteArray.Length);
-                    cs.FlushFinalBlock();
-                    return Encoding.Default.GetString(ms.ToArray());
+                    i = Convert.ToInt32(Text.Substring(x * 2, 2), 16);
+                    inputByteArray[x] = (byte)i;
                 }
+
+                //参数str类型是string
+                // 注：.NET Core 不支持System.Web.Security.FormsAuthentication.HashPasswordForStoringInConfigFile(str, "MD5");轉為函數Md5Hash(string input)
+                des.Key = ASCIIEncoding.ASCII.GetBytes(Md5Hash(sKey)[..8]);
+                des.IV = ASCIIEncoding.ASCII.GetBytes(Md5Hash(sKey)[..8]);
+                System.IO.MemoryStream ms = new();
+                CryptoStream cs = new(ms, des.CreateDecryptor(), CryptoStreamMode.Write);
+                cs.Write(inputByteArray, 0, inputByteArray.Length);
+                cs.FlushFinalBlock();
+                return Encoding.Default.GetString(ms.ToArray());
 #pragma warning restore SYSLIB0021 // 类型或成员已过时
             }
             catch (Exception)
@@ -120,16 +116,14 @@ namespace Meta
         public static string Md5Hash(string input)
         {
 #pragma warning disable SYSLIB0021 // 类型或成员已过时
-            using (MD5CryptoServiceProvider md5Hasher = new MD5CryptoServiceProvider())
+            using MD5CryptoServiceProvider md5Hasher = new();
+            byte[] data = md5Hasher.ComputeHash(Encoding.Default.GetBytes(input));
+            StringBuilder sBuilder = new();
+            for (int i = 0; i < data.Length; i++)
             {
-                byte[] data = md5Hasher.ComputeHash(Encoding.Default.GetBytes(input));
-                StringBuilder sBuilder = new StringBuilder();
-                for (int i = 0; i < data.Length; i++)
-                {
-                    sBuilder.Append(data[i].ToString("x2"));
-                }
-                return sBuilder.ToString();
+                sBuilder.Append(data[i].ToString("x2"));
             }
+            return sBuilder.ToString();
 #pragma warning restore SYSLIB0021 // 类型或成员已过时
         }
         #endregion

@@ -8,7 +8,7 @@ using TencentCloud.Common.Profile;
 using TencentCloud.Sms.V20210111;
 using TencentCloud.Sms.V20210111.Models;
 
-namespace Meta
+namespace System
 {
     public static class TencentSMS
     {

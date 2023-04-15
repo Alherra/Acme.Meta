@@ -1,5 +1,4 @@
-﻿using Meta.Core.Enums;
-using Microsoft.AspNetCore.Mvc.Filters;
+﻿using Microsoft.AspNetCore.Mvc.Filters;
 using SqlSugar.IOC;
 using System;
 using System.Collections.Generic;
@@ -10,7 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using TencentCloud.Mna.V20210119.Models;
 
-namespace Meta
+namespace System
 {
     /// <summary>
     /// Extensions for http errors.

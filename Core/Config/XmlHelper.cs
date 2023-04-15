@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using System.Xml;
 using TencentCloud.Npp.V20190823.Models;
 
-namespace Meta.Tools
+namespace System.Tools
 {
     public class XmlHelper
     {
@@ -17,7 +17,7 @@ namespace Meta.Tools
         [Description("XML缓存")]
         private static readonly XmlDocument doc = new();
 
-        private static XmlElement xml = null;
+        private static XmlElement xml = null!;
 
         private static XmlElement GetXml()
         {

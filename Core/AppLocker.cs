@@ -35,7 +35,7 @@ namespace System
                 redisKey = redisLockKey + key;
 
                 // 冲突性质的操作抛出异常停止
-                if (RedisServer.Get<bool>(redisKey))
+                if (RedisClient.Get<bool>(redisKey).Result)
                 {
                     if (rollBack)
                     {
@@ -43,14 +43,14 @@ namespace System
                     }
 
                     // Redis 等待锁
-                    while (RedisServer.Get<bool>(redisKey))
+                    while (RedisClient.Get<bool>(redisKey).Result)
                     {
                         Thread.Sleep(100);
                     }
                 }
 
                 // Redis 加锁
-                RedisServer.Set(redisKey, true);
+                RedisClient.Set(redisKey, true, 120);
             }
 
             /// <summary>
@@ -59,7 +59,7 @@ namespace System
             public override async void Dispose()
             {
                 // Redis 解锁
-                await RedisServer.SetAsync(redisKey, false);
+                await RedisClient.Set(redisKey, false, 10);
                 GC.SuppressFinalize(this);
             }
         }

@@ -1,5 +1,4 @@
-﻿using Meta.Tools;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -8,13 +7,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Meta.Shares
+namespace System.Shares
 {
     /// <summary>
     /// 文件管理
     /// </summary>
     [Description("文件管理")]
-    public class FileController : MetaController
+    public class FileController : WebAPI
     {
         /// <summary>
         /// 允许的文件类型

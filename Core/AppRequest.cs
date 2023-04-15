@@ -7,7 +7,7 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Meta.Tools
+namespace System.Tools
 {
     /// <summary>
     /// Http请求
@@ -25,7 +25,7 @@ namespace Meta.Tools
         public static string Post<T>(string url, T t)
         {
             var data = JsonConvert.SerializeObject(t);
-            return PostDataViaHttpWebRequest(url, null, null, data);
+            return PostDataViaHttpWebRequest(url, null!, null!, data);
         }
 
         /// <summary>
@@ -138,7 +138,7 @@ namespace Meta.Tools
         private static string PostDataViaHttpWebRequest(string baseUrl,
             IReadOnlyDictionary<string, string> headers,
             IReadOnlyDictionary<string, string> urlParas,
-            string requestBody = null)
+            string requestBody = null!)
         {
             var resuleJson = string.Empty;
             try

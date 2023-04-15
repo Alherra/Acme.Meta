@@ -1,8 +1,7 @@
-﻿using Meta.Core.Enums;
-using Microsoft.AspNetCore.Mvc.Filters;
+﻿using Microsoft.AspNetCore.Mvc.Filters;
 using System.ComponentModel;
 
-namespace Meta
+namespace System
 {
     /// <summary>
     /// 账户权限

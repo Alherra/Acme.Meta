@@ -11,7 +11,7 @@ namespace Microsoft.AspNetCore.Mvc.Core
 {
     internal static class Resources
     {
-        private static readonly ResourceManager _resourceManager = new ResourceManager("Microsoft.AspNetCore.Mvc.Core.Resources", typeof(Resources).GetTypeInfo().Assembly);
+        private static readonly ResourceManager _resourceManager = new("Microsoft.AspNetCore.Mvc.Core.Resources", typeof(Resources).GetTypeInfo().Assembly);
 
         //
         // 摘要:

@@ -7,7 +7,7 @@
 //using System.Linq;
 //using System.Reflection;
 
-//namespace Meta
+//namespace System
 //{
 //    public class JWTHelper
 //    {

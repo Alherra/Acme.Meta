@@ -13,7 +13,7 @@ using File = System.IO.File;
 using System.ComponentModel;
 using System.Speech.Synthesis;
 
-namespace Meta
+namespace System
 {
     public class SharedTool : IDisposable
     {

@@ -6,7 +6,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Meta.Tools
+namespace System.Tools
 {
     /// <summary>
     /// 创建动态类型
@@ -40,7 +40,7 @@ namespace Meta.Tools
                 numberGetIL.Emit(OpCodes.Ret);
                 //set方法
                 MethodBuilder mbNumberSetAccessor = dyClass.DefineMethod("set_" + item.Key, MethodAttributes.Public | MethodAttributes.SpecialName | MethodAttributes.HideBySig,
-               null, new Type[] { item.Value });
+               null!, new Type[] { item.Value });
                 ILGenerator numberSetIL = mbNumberSetAccessor.GetILGenerator();
                 numberSetIL.Emit(OpCodes.Ldarg_0);
                 numberSetIL.Emit(OpCodes.Ldarg_1);

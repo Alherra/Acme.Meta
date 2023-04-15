@@ -1,12 +1,13 @@
-﻿using System.ComponentModel;
+﻿using System.Account;
+using System.ComponentModel;
 
-namespace Meta.Account
+namespace System
 {
     /// <summary>
     /// 用户资源服务
     /// </summary>
     [Description("用户资源服务")]
-    public class AccountService : MetaService, IAccountService
+    internal class AccountService : MetaService, IAccountService
     {
         /// <summary>
         /// 登录

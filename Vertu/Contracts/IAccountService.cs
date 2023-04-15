@@ -1,12 +1,11 @@
-﻿using Meta.Account;
-using System;
+﻿using System.Account;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Meta
+namespace System
 {
     /// <summary>
     /// 用户资源服务接口

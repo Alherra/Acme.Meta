@@ -1,5 +1,4 @@
-﻿using Meta.Account;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using SqlSugar.IOC;
@@ -11,7 +10,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Meta
+namespace System
 {
     /// <summary>
     /// Meta初始化配置
@@ -87,11 +86,13 @@ namespace Meta
         [Description("依赖注入")]
         private static IServiceCollection AddAutoInjection(this IServiceCollection serviceCollection)
         {
-            serviceCollection.TryAddSingleton(typeof(IHttpContextAccessor), typeof(HttpContextAccessor));
-            serviceCollection.TryAddSingleton(typeof(IAccountService), typeof(AccountService));
+            serviceCollection.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            serviceCollection.TryAddSingleton<IAccountService, AccountService>();
+            serviceCollection.TryAddSingleton<IRedis>(RedisClient.Instance);
 
             #region 查询依赖注入特性配置
-            var services = AppDomain.CurrentDomain.GetAssemblies()
+            var services = Directory.GetFiles(AppContext.BaseDirectory, "*.dll")
+                .Select(Assembly.LoadFile)
                 .SelectMany(a => a.GetTypes())
                 .Where(t => t.GetCustomAttribute<AutoInjectAttribute>() != null)
                 .ToList();

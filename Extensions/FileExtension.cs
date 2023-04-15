@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
+using MiniExcelLibs;
+using Newtonsoft.Json;
 using NPOI.HSSF.UserModel;
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
@@ -15,15 +17,15 @@ namespace System
         /// <summary>
         /// Save the file to a path.
         /// </summary>
-        /// <param name="file">The file upload.</param>
+        /// <param name="stream">The file upload.</param>
         /// <param name="filePath">The path to save the file.</param>
         /// <returns></returns>
-        public static async Task<bool> SaveTo(this IFormFile file, string filePath)
+        public static async Task<bool> SaveTo(this Stream stream, string filePath)
         {
             if (File.Exists(filePath)) File.Delete(filePath);
 
-            using var stream = File.OpenWrite(filePath);
-            var task = file.CopyToAsync(stream);
+            using var fileStream = File.OpenWrite(filePath);
+            var task = stream.CopyToAsync(fileStream);
             await task;
             while (!task.IsCompleted) Thread.Sleep(100);
 
@@ -74,6 +76,45 @@ namespace System
             }
 
             return await Task.FromResult(list);
+        }
+
+        /// <summary>
+        /// From excel file data to list.
+        /// </summary>
+        /// <typeparam name="TClass">The list data class type.</typeparam>
+        /// <param name="stream">The excel file stream.</param>
+        /// <param name="map">The map from title to field.</param>
+        /// <returns></returns>
+        public static async Task<List<TClass>> ToList<TClass>(this Stream stream, Dictionary<string, string> map = null!)
+        {
+            var data = await MiniExcel.QueryAsync(stream);
+
+            if (!data.Any())
+                return new List<TClass>();
+
+            var properties = typeof(TClass).GetProperties().Where(x => x.SetMethod != null).ToDictionary(x => x.Name.ToUpper(), x => x);
+
+            return data
+                .Select(x => ((object)x).GetType().GetProperties().ToDictionary(p => p.Name, p => Convert.ToString(p.GetValue(x))))
+                .Select(x =>
+                {
+                    var instance = Activator.CreateInstance<TClass>();
+                    foreach (var field in x)
+                    {
+                        var key = map.ContainsKey(field.Key) ? map[field.Key] : field.Key;
+                        if (properties.ContainsKey(key.ToUpper()))
+                        {
+                            var property = properties[key.ToUpper()];
+                            var propertyType = property.PropertyType;
+
+                            if (propertyType == typeof(string))
+                                property.SetValue(instance, field.Value);
+                            else
+                                property.SetValue(instance, Convert.ChangeType(field.Value, propertyType));
+                        }
+                    }
+                    return instance;
+                }).ToList();
         }
     }
 }

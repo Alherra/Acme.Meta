@@ -14,6 +14,7 @@ using System.Text;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.AspNetCore.Mvc;
 
+
 namespace Meta
 {
     /// <summary>
@@ -426,7 +427,7 @@ namespace Meta
         [NonAction]
         public virtual RedirectToActionResult RedirectToAction(string actionName, object routeValues)
         {
-            return RedirectToAction(actionName, null, routeValues);
+            return RedirectToAction(actionName, null!, routeValues);
         }
 
         /// <summary>
@@ -467,7 +468,7 @@ namespace Meta
         [NonAction]
         public virtual RedirectToActionResult RedirectToAction(string actionName, string controllerName, string fragment)
         {
-            return RedirectToAction(actionName, controllerName, null, fragment);
+            return RedirectToAction(actionName, controllerName, null!, fragment);
         }
 
         /// <summary>
@@ -501,7 +502,7 @@ namespace Meta
         /// <param name="fragment">The fragment to add to the URL.</param>
         /// <returns>The created Microsoft.AspNetCore.Mvc.RedirectToActionResult for the response.</returns>
         [NonAction]
-        public virtual RedirectToActionResult RedirectToActionPreserveMethod(string actionName = null, string controllerName = null, object routeValues = null, string fragment = null)
+        public virtual RedirectToActionResult RedirectToActionPreserveMethod(string actionName = null!, string controllerName = null!, object routeValues = null!, string fragment = null!)
         {
             return new RedirectToActionResult(actionName, controllerName, routeValues, permanent: false, preserveMethod: true, fragment)
             {
@@ -533,7 +534,7 @@ namespace Meta
         [NonAction]
         public virtual RedirectToActionResult RedirectToActionPermanent(string actionName, object routeValues)
         {
-            return RedirectToActionPermanent(actionName, null, routeValues);
+            return RedirectToActionPermanent(actionName, null!, routeValues);
         }
 
         /// <summary>
@@ -562,7 +563,7 @@ namespace Meta
         [NonAction]
         public virtual RedirectToActionResult RedirectToActionPermanent(string actionName, string controllerName, string fragment)
         {
-            return RedirectToActionPermanent(actionName, controllerName, null, fragment);
+            return RedirectToActionPermanent(actionName, controllerName, null!, fragment);
         }
 
         /// <summary>
@@ -613,7 +614,7 @@ namespace Meta
         /// <param name="fragment">The fragment to add to the URL.</param>
         /// <returns>The created Microsoft.AspNetCore.Mvc.RedirectToActionResult for the response.</returns>
         [NonAction]
-        public virtual RedirectToActionResult RedirectToActionPermanentPreserveMethod(string actionName = null, string controllerName = null, object routeValues = null, string fragment = null)
+        public virtual RedirectToActionResult RedirectToActionPermanentPreserveMethod(string actionName = null!, string controllerName = null!, object routeValues = null!, string fragment = null!)
         {
             return new RedirectToActionResult(actionName, controllerName, routeValues, permanent: true, preserveMethod: true, fragment)
             {
@@ -642,7 +643,7 @@ namespace Meta
         [NonAction]
         public virtual RedirectToRouteResult RedirectToRoute(object routeValues)
         {
-            return RedirectToRoute(null, routeValues);
+            return RedirectToRoute(null!, routeValues);
         }
 
         /// <summary>
@@ -668,7 +669,7 @@ namespace Meta
         [NonAction]
         public virtual RedirectToRouteResult RedirectToRoute(string routeName, string fragment)
         {
-            return RedirectToRoute(routeName, null, fragment);
+            return RedirectToRoute(routeName, null!, fragment);
         }
 
         /// <summary>
@@ -699,7 +700,7 @@ namespace Meta
         /// <param name="fragment">The fragment to add to the URL.</param>
         /// <returns>The created Microsoft.AspNetCore.Mvc.RedirectToRouteResult for the response.</returns>
         [NonAction]
-        public virtual RedirectToRouteResult RedirectToRoutePreserveMethod(string routeName = null, object routeValues = null, string fragment = null)
+        public virtual RedirectToRouteResult RedirectToRoutePreserveMethod(string routeName = null!, object routeValues = null!, string fragment = null!)
         {
             return new RedirectToRouteResult(routeName, routeValues, permanent: false, preserveMethod: true, fragment)
             {
@@ -730,7 +731,7 @@ namespace Meta
         [NonAction]
         public virtual RedirectToRouteResult RedirectToRoutePermanent(object routeValues)
         {
-            return RedirectToRoutePermanent(null, routeValues);
+            return RedirectToRoutePermanent(null!, routeValues);
         }
 
         /// <summary>
@@ -758,7 +759,7 @@ namespace Meta
         [NonAction]
         public virtual RedirectToRouteResult RedirectToRoutePermanent(string routeName, string fragment)
         {
-            return RedirectToRoutePermanent(routeName, null, fragment);
+            return RedirectToRoutePermanent(routeName, null!, fragment);
         }
 
         /// <summary>
@@ -790,7 +791,7 @@ namespace Meta
         /// <param name="fragment">The fragment to add to the URL.</param>
         /// <returns>The created Microsoft.AspNetCore.Mvc.RedirectToRouteResult for the response.</returns>
         [NonAction]
-        public virtual RedirectToRouteResult RedirectToRoutePermanentPreserveMethod(string routeName = null, object routeValues = null, string fragment = null)
+        public virtual RedirectToRouteResult RedirectToRoutePermanentPreserveMethod(string routeName = null!, object routeValues = null!, string fragment = null!)
         {
             return new RedirectToRouteResult(routeName, routeValues, permanent: true, preserveMethod: true, fragment)
             {
@@ -819,7 +820,7 @@ namespace Meta
         [NonAction]
         public virtual RedirectToPageResult RedirectToPage(string pageName, object routeValues)
         {
-            return RedirectToPage(pageName, null, routeValues, null);
+            return RedirectToPage(pageName, null!, routeValues, null);
         }
 
         /// <summary>
@@ -859,7 +860,7 @@ namespace Meta
         [NonAction]
         public virtual RedirectToPageResult RedirectToPage(string pageName, string pageHandler, string fragment)
         {
-            return RedirectToPage(pageName, pageHandler, null, fragment);
+            return RedirectToPage(pageName, pageHandler, null!, fragment);
         }
 
         /// <summary>
@@ -899,7 +900,7 @@ namespace Meta
         [NonAction]
         public virtual RedirectToPageResult RedirectToPagePermanent(string pageName, object routeValues)
         {
-            return RedirectToPagePermanent(pageName, null, routeValues, null);
+            return RedirectToPagePermanent(pageName, null!, routeValues, null);
         }
 
         /// <summary>
@@ -912,7 +913,7 @@ namespace Meta
         [NonAction]
         public virtual RedirectToPageResult RedirectToPagePermanent(string pageName, string pageHandler)
         {
-            return RedirectToPagePermanent(pageName, pageHandler, null, null);
+            return RedirectToPagePermanent(pageName, pageHandler, null!, null);
         }
 
         /// <summary>
@@ -926,7 +927,7 @@ namespace Meta
         [NonAction]
         public virtual RedirectToPageResult RedirectToPagePermanent(string pageName, string pageHandler, string fragment)
         {
-            return RedirectToPagePermanent(pageName, pageHandler, null, fragment);
+            return RedirectToPagePermanent(pageName, pageHandler, null!, fragment);
         }
 
         /// <summary>
@@ -957,7 +958,7 @@ namespace Meta
         /// <returns>The created Microsoft.AspNetCore.Mvc.RedirectToRouteResult for the response.</returns>
         /// <exception cref="ArgumentNullException"></exception>
         [NonAction]
-        public virtual RedirectToPageResult RedirectToPagePreserveMethod(string pageName, string pageHandler = null, object routeValues = null, string fragment = null)
+        public virtual RedirectToPageResult RedirectToPagePreserveMethod(string pageName, string pageHandler = null!, object routeValues = null!, string fragment = null!)
         {
             if (pageName == null)
                 throw new ArgumentNullException(nameof(pageName));
@@ -978,7 +979,7 @@ namespace Meta
         /// <returns>The created Microsoft.AspNetCore.Mvc.RedirectToRouteResult for the response.</returns>
         /// <exception cref="ArgumentNullException"></exception>
         [NonAction]
-        public virtual RedirectToPageResult RedirectToPagePermanentPreserveMethod(string pageName, string pageHandler = null, object routeValues = null, string fragment = null)
+        public virtual RedirectToPageResult RedirectToPagePermanentPreserveMethod(string pageName, string pageHandler = null!, object routeValues = null!, string fragment = null!)
         {
             if (pageName == null)
                 throw new ArgumentNullException(nameof(pageName));
@@ -1014,7 +1015,7 @@ namespace Meta
         [NonAction]
         public virtual FileContentResult File(byte[] fileContents, string contentType, bool enableRangeProcessing)
         {
-            return File(fileContents, contentType, null, enableRangeProcessing);
+            return File(fileContents, contentType, null!, enableRangeProcessing);
         }
 
         /// <summary>
@@ -1181,7 +1182,7 @@ namespace Meta
         [NonAction]
         public virtual FileStreamResult File(Stream fileStream, string contentType, bool enableRangeProcessing)
         {
-            return File(fileStream, contentType, null, enableRangeProcessing);
+            return File(fileStream, contentType, null!, enableRangeProcessing);
         }
 
         /// <summary>
@@ -1348,7 +1349,7 @@ namespace Meta
         [NonAction]
         public virtual VirtualFileResult File(string virtualPath, string contentType, bool enableRangeProcessing)
         {
-            return File(virtualPath, contentType, null, enableRangeProcessing);
+            return File(virtualPath, contentType, null!, enableRangeProcessing);
         }
 
         /// <summary>
@@ -1515,7 +1516,7 @@ namespace Meta
         [NonAction]
         public virtual PhysicalFileResult PhysicalFile(string physicalPath, string contentType, bool enableRangeProcessing)
         {
-            return PhysicalFile(physicalPath, contentType, null, enableRangeProcessing);
+            return PhysicalFile(physicalPath, contentType, null!, enableRangeProcessing);
         }
 
         /// <summary>
@@ -1887,7 +1888,7 @@ namespace Meta
         [NonAction]
         public virtual CreatedAtActionResult CreatedAtAction(string actionName, [ActionResultObjectValue] object value)
         {
-            return CreatedAtAction(actionName, null, value);
+            return CreatedAtAction(actionName, null!, value);
         }
 
         /// <summary>
@@ -1901,7 +1902,7 @@ namespace Meta
         [NonAction]
         public virtual CreatedAtActionResult CreatedAtAction(string actionName, object routeValues, [ActionResultObjectValue] object value)
         {
-            return CreatedAtAction(actionName, null, routeValues, value);
+            return CreatedAtAction(actionName, null!, routeValues, value);
         }
 
         /// <summary>
@@ -1929,7 +1930,7 @@ namespace Meta
         [NonAction]
         public virtual CreatedAtRouteResult CreatedAtRoute(string routeName, [ActionResultObjectValue] object value)
         {
-            return CreatedAtRoute(routeName, null, value);
+            return CreatedAtRoute(routeName, null!, value);
         }
 
         /// <summary>
@@ -1942,7 +1943,7 @@ namespace Meta
         [NonAction]
         public virtual CreatedAtRouteResult CreatedAtRoute(object routeValues, [ActionResultObjectValue] object value)
         {
-            return CreatedAtRoute(null, routeValues, value);
+            return CreatedAtRoute(null!, routeValues, value);
         }
 
         /// <summary>
@@ -2068,7 +2069,7 @@ namespace Meta
         [NonAction]
         public virtual AcceptedAtActionResult AcceptedAtAction(string actionName, string controllerName)
         {
-            return AcceptedAtAction(actionName, controllerName, null, null);
+            return AcceptedAtAction(actionName, controllerName, null!, null);
         }
 
         /// <summary>
@@ -2109,7 +2110,7 @@ namespace Meta
         [NonAction]
         public virtual AcceptedAtActionResult AcceptedAtAction(string actionName, object routeValues, [ActionResultObjectValue] object value)
         {
-            return AcceptedAtAction(actionName, null, routeValues, value);
+            return AcceptedAtAction(actionName, null!, routeValues, value);
         }
 
         /// <summary>
@@ -2136,7 +2137,7 @@ namespace Meta
         [NonAction]
         public virtual AcceptedAtRouteResult AcceptedAtRoute([ActionResultObjectValue] object routeValues)
         {
-            return AcceptedAtRoute(null, routeValues, null);
+            return AcceptedAtRoute(null!, routeValues, null);
         }
 
         /// <summary>
@@ -2148,7 +2149,7 @@ namespace Meta
         [NonAction]
         public virtual AcceptedAtRouteResult AcceptedAtRoute(string routeName)
         {
-            return AcceptedAtRoute(routeName, null, null);
+            return AcceptedAtRoute(routeName, null!, null);
         }
 
         /// <summary>
@@ -2174,7 +2175,7 @@ namespace Meta
         [NonAction]
         public virtual AcceptedAtRouteResult AcceptedAtRoute(object routeValues, [ActionResultObjectValue] object value)
         {
-            return AcceptedAtRoute(null, routeValues, value);
+            return AcceptedAtRoute(null!, routeValues, value);
         }
 
         /// <summary>
@@ -2604,7 +2605,7 @@ namespace Meta
             if (model == null)
                 throw new ArgumentNullException(nameof(model));
 
-            ObjectValidator.Validate(ControllerContext, null, prefix ?? string.Empty, model);
+            ObjectValidator.Validate(ControllerContext, null!, prefix ?? string.Empty, model);
             return ModelState.IsValid;
         }
     }

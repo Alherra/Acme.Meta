@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Meta
+namespace System
 {
     /// <summary>
     /// 缓存
@@ -198,10 +198,8 @@ namespace Meta
                     var logData = LogDatas.Dequeue();
                     try
                     {
-                        using (var sw = new StreamWriter(logData.Path, true))
-                        {
-                            await sw.WriteLineAsync(logData.LogMessage);
-                        }
+                        using var sw = new StreamWriter(logData.Path, true);
+                        await sw.WriteLineAsync(logData.LogMessage);
                     }
                     catch (Exception)
                     {

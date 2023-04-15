@@ -3,9 +3,9 @@ using SqlSugar.IOC;
 using SqlSugar;
 using System.ComponentModel;
 using System.Linq.Expressions;
-using Meta.Meta.Audit;
+using Meta;
 
-namespace Meta
+namespace System
 {
     /// <summary>
     /// 服务基类
@@ -36,7 +36,7 @@ namespace Meta
         protected static TClass CreateInstance<TClass>(string func = "", params Object[] objects) => 
             func.Equals("") 
             ? Activator.CreateInstance<TClass>()
-            : (TClass)(typeof(TClass).GetMethod(func)?.Invoke(null, objects) ?? default(TClass))!;
+            : (TClass)(typeof(TClass).GetMethod(func)?.Invoke(null!, objects) ?? default(TClass))!;
 
         /// <summary>
         /// 数据服务
