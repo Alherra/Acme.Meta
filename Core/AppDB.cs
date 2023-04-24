@@ -22,19 +22,12 @@ namespace System
         /// <summary>
         /// Sugar 客户端
         /// </summary>
-        private readonly SqlSugarScope _db;
+        private readonly SqlSugarScope _db = DbScoped.SugarScope;
 
         /// <summary>
         /// 当前用户信息
         /// </summary>
-        private static CacheUser User
-        {
-            get
-            {
-                var key = Activator.CreateInstance<HttpContextAccessor>().HttpContext.Connection.Id;
-                return CacheServer.Find(key);
-            }
-        }
+        private static CacheUser User => CacheServer.Find(ServiceProvider.HttpContext.Connection.Id);
 
         /// <summary>
         /// 是否开启事务
@@ -114,7 +107,7 @@ namespace System
         /// <typeparam name="TabelClass">表数据类</typeparam>
         /// <returns></returns>
         /// <remarks>自动化过滤</remarks>
-        public ISugarQueryable<TabelClass> Query<TabelClass>()
+        public ISugarQueryable<TabelClass> Queryable<TabelClass>()
         {
             var queryable = _db.Queryable<TabelClass>();
             var list = new List<IConditionalModel>();
@@ -168,7 +161,7 @@ namespace System
             #region Id Check
             var prop = type.GetProperty("Id");
             if (prop?.PropertyType == typeof(Guid))
-                while (Query<TabelClass>().Where("Id='" + prop.GetValue(data) + "'").Any())
+                while (Queryable<TabelClass>().Where("Id='" + prop.GetValue(data) + "'").Any())
                 {
                     prop.SetValue(data, Guid.NewGuid());
                 }
@@ -354,19 +347,22 @@ namespace System
         #endregion
 
         /// <summary>
-        /// 实例化
+        /// Constructor
         /// </summary>
         private AppDB(bool doTran = true)
         {
             _doTran = doTran;
 
-            #region 获取Sugar客户端
-            _db = DbScoped.SugarScope;
-            if (_doTran)
-                _db.BeginTran();
-            #endregion
+            if (_doTran) _db.BeginTran();
         }
 
+        /// <summary>
+        /// Get client.
+        /// </summary>
+        /// <param name="db"></param>
+        public static explicit operator SqlSugarScope(AppDB db) => db._db;
+
+        #region Dispose
         protected virtual void Dispose(bool disposing)
         {
             if (!disposedValue)
@@ -411,5 +407,6 @@ namespace System
             Dispose(disposing: true);
             GC.SuppressFinalize(this);
         }
+        #endregion
     }
 }
