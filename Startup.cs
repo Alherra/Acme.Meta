@@ -26,8 +26,6 @@ namespace System
         [Description("启用Meta")]
         public static IServiceCollection RunMeta(this IServiceCollection services)
         {
-            var ps = typeof(IdentityUser).GetProperties();
-
             #region SqlSugar Ioc
             // 注入 ORM
             services.AddSqlSugar(new IocConfig()
@@ -55,7 +53,7 @@ namespace System
             #endregion
 
             // 依赖注入
-            services.AddAutoInjection();
+            services.AutoInjection();
 
             // 初始化数据表
             services.InitSugarTables();
@@ -77,18 +75,19 @@ namespace System
         }
 
         /// <summary>
-        /// 依赖注入
+        /// Dependency
         /// 
-        /// 自动注入所有的程序集
+        /// Auto Injection.
         /// </summary>
         /// <param name="serviceCollection"></param>
         /// <returns></returns>
-        [Description("依赖注入")]
-        private static IServiceCollection AddAutoInjection(this IServiceCollection serviceCollection)
+        [Description("DependencyInject")]
+        private static IServiceCollection AutoInjection(this IServiceCollection serviceCollection)
         {
             serviceCollection.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             serviceCollection.TryAddSingleton<IAccountService, AccountService>();
             serviceCollection.TryAddSingleton<IRedis>(RedisClient.Instance);
+            serviceCollection.TryAddScoped<IEmail, Email>();
 
             #region 查询依赖注入特性配置
             var services = Directory.GetFiles(AppContext.BaseDirectory, "*.dll")
@@ -133,17 +132,22 @@ namespace System
         [Description("更新数据表结构")]
         private static IServiceCollection InitSugarTables(this IServiceCollection services)
         {
-            try
+            Task.Run(() =>
             {
-                var tables = AppDomain.CurrentDomain.GetAssemblies().SelectMany(a => a.GetTypes())
-                 .Where(t => t.CustomAttributes != null && t.CustomAttributes.Any(a => a.AttributeType.Name == "SugarTable"))
-                 .ToArray();
-                DbScoped.SugarScope.CodeFirst.InitTables(tables);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex);
-            }
+                try
+                {
+                    var tables = Directory.GetFiles(AppContext.BaseDirectory, "*.dll")
+                        .Select(Assembly.LoadFrom)
+                        .SelectMany(a => a.GetTypes())
+                        .Where(t => t.CustomAttributes != null && t.CustomAttributes.Any(a => a.AttributeType.Name == "SugarTable"))
+                        .ToArray();
+                    DbScoped.SugarScope.CodeFirst.InitTables(tables);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex);
+                }
+            });
             return services;
         }
     }
