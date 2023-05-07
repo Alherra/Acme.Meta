@@ -87,7 +87,8 @@ namespace System
             serviceCollection.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             serviceCollection.TryAddSingleton<IAccountService, AccountService>();
             serviceCollection.TryAddSingleton<IRedis>(RedisClient.Instance);
-            serviceCollection.TryAddScoped<IEmail, Email>();
+            serviceCollection.TryAddSingleton<IEmail, Email>();
+            serviceCollection.TryAddSingleton<ITencentSMS, TencentSMS>();
 
             #region 查询依赖注入特性配置
             var services = Directory.GetFiles(AppContext.BaseDirectory, "*.dll")

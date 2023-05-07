@@ -1,39 +1,27 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TencentCloud.Common;
+﻿using TencentCloud.Common;
 using TencentCloud.Common.Profile;
 using TencentCloud.Sms.V20210111;
 using TencentCloud.Sms.V20210111.Models;
 
 namespace System
 {
-    public static class TencentSMS
+    internal class TencentSMS : ITencentSMS
     {
-        /// <summary>
-        /// 发短信
-        /// </summary>
-        /// <param name="message"></param>
-        /// <param name="phoneNumber">手机号，不含+86</param>
-        /// <param name="template"></param>
-        /// <param name="state"></param>
-        /// <returns></returns>
-        /// <exception cref="Exception"></exception>
-        public async static Task Send(string message, ulong phoneNumber, SendTemplate template, ushort state = 86)
+        private readonly string SecretId;
+        private readonly string SecretKey;
+        private readonly string SmsSdkAppId;
+        private readonly string SignName;
+
+        public TencentSMS()
         {
-            string SecretId = string.Empty,
-            SecretKey = string.Empty,
-            SmsSdkAppId = string.Empty,
-            SignName = string.Empty;
-            await Task.Run(() =>
-            {
-                SecretId = AppSetting.Get("TencentSms.SecretId");
-                SecretKey = AppSetting.Get("TencentSms.SecretKey");
-                SmsSdkAppId = AppSetting.Get("TencentSms.SmsSdkAppId");
-                SignName = AppSetting.Get("TencentSms.SignName");
-            });
+            SecretId = AppSetting.Get("TencentSms.SecretId");
+            SecretKey = AppSetting.Get("TencentSms.SecretKey");
+            SmsSdkAppId = AppSetting.Get("TencentSms.SmsSdkAppId");
+            SignName = AppSetting.Get("TencentSms.SignName");
+        }
+
+        public async Task Send(string message, ulong phoneNumber, SendTemplate template, ushort state = 86)
+        {
             Credential cred = new()
             {
                 SecretId = SecretId,
