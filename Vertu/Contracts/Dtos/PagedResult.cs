@@ -18,7 +18,7 @@ namespace System
         /// Total count of Items
         /// </summary>
         [Description("List-Count")]
-        public virtual long Count
+        public virtual int Total
         {
             get;
             set;
@@ -37,13 +37,38 @@ namespace System
         /// <summary>
         /// Creates a new PagedResultDto`1 object.
         /// </summary>
-        /// <param name="count">Total count of Items</param>
+        /// <param name="total">Total count of Items</param>
         /// <param name="items">List of items in current page</param>
         [Description("Paged-Result")]
-        public PagedResult(long count, IReadOnlyList<T> items)
+        public PagedResult(int total, IReadOnlyList<T> items)
         {
-            Count = count;
+            Total = total;
             Items = items;
         }
+
+    }
+
+    /// <summary>
+    /// Paged result object.
+    /// </summary>
+    public class PagedResult
+    {
+        /// <summary>
+        /// To create an result.
+        /// </summary>
+        /// <typeparam name="Tr"></typeparam>
+        /// <param name="total"></param>
+        /// <param name="items"></param>
+        /// <returns></returns>
+        public static PagedResult<Tr> Create<Tr>(int total, IReadOnlyList<Tr> items) => new PagedResult<Tr>(total, items);
+
+        /// <summary>
+        /// To create an result.
+        /// </summary>
+        /// <typeparam name="Tr"></typeparam>
+        /// <param name="total"></param>
+        /// <param name="items"></param>
+        /// <returns></returns>
+        public static PagedResult<Tr> Create<Tr>(IReadOnlyList<Tr> items, int total) => new PagedResult<Tr>(total, items);
     }
 }

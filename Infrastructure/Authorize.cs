@@ -11,12 +11,6 @@ namespace System
     public class Authorize : ActionFilterAttribute//, IAuthorizeData
     {
         /// <summary>
-        /// ABP关联权限
-        /// </summary>
-        [Description("ABP关联权限")]
-        public bool Abp { get; set; }
-
-        /// <summary>
         /// Gets or sets the policy name that determines access to the resource.
         /// </summary>
         [Description("权限归属")]
