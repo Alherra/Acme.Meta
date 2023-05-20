@@ -92,11 +92,11 @@ namespace System.Linq
         [Description("Paged-Extension")]
         public static PagedResult<T> ToPageList<T>(this IEnumerable<T> source, PagedInput input)
         {
-            if (input.PageNum <= 0) input.PageNum = 1;
+            if (input.CurrentPage <= 0) input.CurrentPage = 1;
             if (input.PageSize <= 0) input.PageSize = 10;
 
             var result = source
-                .Skip((input.PageNum - 1) * input.PageSize)
+                .Skip((input.CurrentPage - 1) * input.PageSize)
                 .Take(input.PageSize);
             return new PagedResult<T>(source.Count(), result.ToList());
         }
