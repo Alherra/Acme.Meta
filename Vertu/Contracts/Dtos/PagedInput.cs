@@ -19,7 +19,7 @@ namespace System
         /// </summary>
         [DisplayName("Page-Number")]
         [Description("Page-Number")]
-        public virtual int PageNum { get; set; }
+        public virtual int CurrentPage { get; set; }
 
         /// <summary>
         /// The size number of the page.
