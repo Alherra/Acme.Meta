@@ -85,7 +85,7 @@ namespace System
         private static IServiceCollection AutoInjection(this IServiceCollection serviceCollection)
         {
             serviceCollection.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-            serviceCollection.TryAddSingleton<IAccountService, AccountService>();
+            serviceCollection.TryAddScoped<IAccountService, AccountService>();
             serviceCollection.TryAddSingleton<IRedis>(RedisClient.Instance);
             serviceCollection.TryAddSingleton<IEmail, Email>();
             serviceCollection.TryAddSingleton<ITencentSMS, TencentSMS>();
@@ -106,13 +106,13 @@ namespace System
                     switch (attr?.InjectType)
                     {
                         case InjectType.Scope:
-                            serviceCollection.AddScoped(implement, service);
+                            serviceCollection.TryAddScoped(implement, service);
                             break;
                         case InjectType.Single:
-                            serviceCollection.AddSingleton(implement, service);
+                            serviceCollection.TryAddSingleton(implement, service);
                             break;
                         case InjectType.Transient:
-                            serviceCollection.AddTransient(implement, service);
+                            serviceCollection.TryAddTransient(implement, service);
                             break;
                         default:
                             continue;

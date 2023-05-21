@@ -60,7 +60,7 @@ namespace System
         /// <param name="total"></param>
         /// <param name="items"></param>
         /// <returns></returns>
-        public static PagedResult<Tr> Create<Tr>(int total, IReadOnlyList<Tr> items) => new PagedResult<Tr>(total, items);
+        public static PagedResult<Tr> Create<Tr>(int total, IReadOnlyList<Tr> items) => new(total, items);
 
         /// <summary>
         /// To create an result.
@@ -69,6 +69,6 @@ namespace System
         /// <param name="total"></param>
         /// <param name="items"></param>
         /// <returns></returns>
-        public static PagedResult<Tr> Create<Tr>(IReadOnlyList<Tr> items, int total) => new PagedResult<Tr>(total, items);
+        public static PagedResult<Tr> Create<Tr>(IReadOnlyList<Tr> items, int total) => new(total, items);
     }
 }

@@ -6,9 +6,6 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Configuration.Json;
-using static Google.Protobuf.WellKnownTypes.Field;
-using static System.Net.WebRequestMethods;
 using File = System.IO.File;
 using System.ComponentModel;
 using System.Speech.Synthesis;
@@ -313,8 +310,8 @@ namespace System
                 Port = ":" + AppSetting.Get("Shared.Port");
             });
             #endregion
-            using (SharedTool tool = new(Admin, Pwd, Host))
-                await Task.Run(action);
+            using SharedTool tool = new(Admin, Pwd, Host);
+            await Task.Run(action);
             return true;
         }
 

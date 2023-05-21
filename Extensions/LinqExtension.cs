@@ -40,8 +40,7 @@ namespace System.Linq
             if (typeof(Source) == typeof(Target))
                 return JsonConvert.DeserializeObject<Target>(JsonConvert.SerializeObject(source))!;
 
-            if (target is null)
-                target = Activator.CreateInstance<Target>();
+            target ??= Activator.CreateInstance<Target>();
 
             if (source is null)
                 return target;

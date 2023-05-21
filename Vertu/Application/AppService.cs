@@ -14,7 +14,7 @@ namespace System
         /// CurrentUser
         /// </summary>
         [Description("CurrentUser")]
-        protected readonly CacheUser CurrentUser = CacheServer.Find(ServiceProvider.HttpContext.Connection.Id);
+        protected CacheUser CurrentUser => CacheServer.Find(ServiceProvider.HttpContext.Connection.Id);
 
         /// <summary>
         /// Creates an instance of the specified type using that type's parameterless constructor.

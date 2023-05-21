@@ -19,31 +19,31 @@ namespace System
         /// 用户Token缓存
         /// </summary>
         [Description("用户Token缓存")]
-        private static Dictionary<string, CacheUser> UserConnections = new Dictionary<string, CacheUser>();
+        private static readonly Dictionary<string, CacheUser> UserConnections = new();
 
         /// <summary>
         /// 账户在线缓存
         /// </summary>
         [Description("账户在线缓存")]
-        private static Dictionary<long, DateTime> OnlineCaches = new Dictionary<long, DateTime>();
+        private static readonly Dictionary<long, DateTime> OnlineCaches = new();
 
         /// <summary>
         /// 用户请求记录时间缓存
         /// </summary>
         [Description("用户请求记录时间缓存")]
-        private static Dictionary<string, HashSet<DateTime>> RequestTime = new Dictionary<string, HashSet<DateTime>>();
+        private static readonly Dictionary<string, HashSet<DateTime>> RequestTime = new();
 
         /// <summary>
         /// 用户请求锁定时间缓存
         /// </summary>
         [Description("用户请求锁定时间缓存")]
-        private static Dictionary<string, DateTime> RequestLockTime = new Dictionary<string, DateTime>();
+        private static readonly Dictionary<string, DateTime> RequestLockTime = new();
 
         /// <summary>
         /// 日志数据缓存
         /// </summary>
         [Description("日志数据缓存")]
-        private static Queue<CacheLogger> LogDatas = new Queue<CacheLogger>();
+        private static readonly Queue<CacheLogger> LogDatas = new();
 
         #region User
         /// <summary>

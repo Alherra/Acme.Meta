@@ -51,31 +51,6 @@ namespace System
         /// <param name="func">待执行的代码块包装方法</param>
         /// <param name="doTran">是否开启事务</param>
         /// <returns>代码块执行结果</returns>
-        public static TResult Execute<TResult>(Func<AppDB, TResult> func, bool doTran = true)
-        {
-            // 创建实例
-            using var db = new AppDB(doTran);
-
-            try
-            {
-                // 执行并等待析构提交
-                return func(db);
-            }
-            catch (Exception ex)
-            {
-                // 回滚数据并抛出异常
-                db.ThrowException(ex);
-                throw;
-            }
-        }
-
-        /// <summary>
-        /// 执行代码块
-        /// </summary>
-        /// <typeparam name="TResult">返回结果类型</typeparam>
-        /// <param name="func">待执行的代码块包装方法</param>
-        /// <param name="doTran">是否开启事务</param>
-        /// <returns>代码块执行结果</returns>
         public static async Task<TResult> Execute<TResult>(Func<AppDB, Task<TResult>> func, bool doTran = true)
         {
             // 创建实例
@@ -117,9 +92,8 @@ namespace System
                 /**************    软删除    ***************/
                 list.Add(new ConditionalModel
                 {
-                    FieldName = "Deleted",
-                    ConditionalType = ConditionalType.Equal,
-                    FieldValue = "0"
+                    FieldName = "DeletedTime",
+                    ConditionalType = ConditionalType.EqualNull
                 });
             }
             if (type.IsAssignableTo(typeof(IMultiTenant)))

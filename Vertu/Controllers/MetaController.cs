@@ -72,10 +72,7 @@ namespace Meta
         {
             get
             {
-                if (_controllerContext == null)
-                {
-                    _controllerContext = new ControllerContext();
-                }
+                _controllerContext ??= new ControllerContext();
 
                 return _controllerContext;
             }
@@ -89,8 +86,7 @@ namespace Meta
         {
             get
             {
-                if (_metadataProvider == null)
-                    _metadataProvider = HttpContext?.RequestServices?.GetRequiredService<IModelMetadataProvider>()!;
+                _metadataProvider ??= HttpContext?.RequestServices?.GetRequiredService<IModelMetadataProvider>()!;
 
                 return _metadataProvider;
             }
@@ -107,8 +103,7 @@ namespace Meta
         {
             get
             {
-                if (_modelBinderFactory == null)
-                    _modelBinderFactory = HttpContext?.RequestServices?.GetRequiredService<IModelBinderFactory>()!;
+                _modelBinderFactory ??= HttpContext?.RequestServices?.GetRequiredService<IModelBinderFactory>()!;
 
                 return _modelBinderFactory;
             }
@@ -122,8 +117,7 @@ namespace Meta
         {
             get
             {
-                if (_url == null)
-                    _url = (HttpContext?.RequestServices?.GetRequiredService<IUrlHelperFactory>())?.GetUrlHelper(ControllerContext)!;
+                _url ??= (HttpContext?.RequestServices?.GetRequiredService<IUrlHelperFactory>())?.GetUrlHelper(ControllerContext)!;
 
                 return _url;
             }
@@ -137,8 +131,7 @@ namespace Meta
         {
             get
             {
-                if (_objectValidator == null)
-                    _objectValidator = HttpContext?.RequestServices?.GetRequiredService<IObjectModelValidator>()!;
+                _objectValidator ??= HttpContext?.RequestServices?.GetRequiredService<IObjectModelValidator>()!;
 
                 return _objectValidator;
             }
@@ -402,7 +395,7 @@ namespace Meta
         [NonAction]
         public virtual RedirectToActionResult RedirectToAction()
         {
-            return RedirectToAction(null);
+            return RedirectToAction(null!);
         }
 
         /// <summary>
@@ -454,7 +447,7 @@ namespace Meta
         [NonAction]
         public virtual RedirectToActionResult RedirectToAction(string actionName, string controllerName, object routeValues)
         {
-            return RedirectToAction(actionName, controllerName, routeValues, null);
+            return RedirectToAction(actionName, controllerName, routeValues, null!);
         }
 
         /// <summary>
@@ -578,7 +571,7 @@ namespace Meta
         [NonAction]
         public virtual RedirectToActionResult RedirectToActionPermanent(string actionName, string controllerName, object routeValues)
         {
-            return RedirectToActionPermanent(actionName, controllerName, routeValues, null);
+            return RedirectToActionPermanent(actionName, controllerName, routeValues, null!);
         }
 
         /// <summary>
@@ -656,7 +649,7 @@ namespace Meta
         [NonAction]
         public virtual RedirectToRouteResult RedirectToRoute(string routeName, object routeValues)
         {
-            return RedirectToRoute(routeName, routeValues, null);
+            return RedirectToRoute(routeName, routeValues, null!);
         }
 
         /// <summary>
@@ -745,7 +738,7 @@ namespace Meta
         [NonAction]
         public virtual RedirectToRouteResult RedirectToRoutePermanent(string routeName, object routeValues)
         {
-            return RedirectToRoutePermanent(routeName, routeValues, null);
+            return RedirectToRoutePermanent(routeName, routeValues, null!);
         }
 
         /// <summary>
@@ -820,7 +813,7 @@ namespace Meta
         [NonAction]
         public virtual RedirectToPageResult RedirectToPage(string pageName, object routeValues)
         {
-            return RedirectToPage(pageName, null!, routeValues, null);
+            return RedirectToPage(pageName, null!, routeValues, null!);
         }
 
         /// <summary>
@@ -846,7 +839,7 @@ namespace Meta
         [NonAction]
         public virtual RedirectToPageResult RedirectToPage(string pageName, string pageHandler, object routeValues)
         {
-            return RedirectToPage(pageName, pageHandler, routeValues, null);
+            return RedirectToPage(pageName, pageHandler, routeValues, null!);
         }
 
         /// <summary>
@@ -900,7 +893,7 @@ namespace Meta
         [NonAction]
         public virtual RedirectToPageResult RedirectToPagePermanent(string pageName, object routeValues)
         {
-            return RedirectToPagePermanent(pageName, null!, routeValues, null);
+            return RedirectToPagePermanent(pageName, null!, routeValues, null!);
         }
 
         /// <summary>
@@ -913,7 +906,7 @@ namespace Meta
         [NonAction]
         public virtual RedirectToPageResult RedirectToPagePermanent(string pageName, string pageHandler)
         {
-            return RedirectToPagePermanent(pageName, pageHandler, null!, null);
+            return RedirectToPagePermanent(pageName, pageHandler, null!, null!);
         }
 
         /// <summary>
@@ -999,7 +992,7 @@ namespace Meta
         [NonAction]
         public virtual FileContentResult File(byte[] fileContents, string contentType)
         {
-            return File(fileContents, contentType, null);
+            return File(fileContents, contentType, null!);
         }
 
         /// <summary>
@@ -1166,7 +1159,7 @@ namespace Meta
         [NonAction]
         public virtual FileStreamResult File(Stream fileStream, string contentType)
         {
-            return File(fileStream, contentType, null);
+            return File(fileStream, contentType, null!);
         }
 
         /// <summary>
@@ -1333,7 +1326,7 @@ namespace Meta
         [NonAction]
         public virtual VirtualFileResult File(string virtualPath, string contentType)
         {
-            return File(virtualPath, contentType, null);
+            return File(virtualPath, contentType, null!);
         }
 
         /// <summary>
@@ -1500,7 +1493,7 @@ namespace Meta
         [NonAction]
         public virtual PhysicalFileResult PhysicalFile(string physicalPath, string contentType)
         {
-            return PhysicalFile(physicalPath, contentType, null);
+            return PhysicalFile(physicalPath, contentType, null!);
         }
 
         /// <summary>
@@ -2069,7 +2062,7 @@ namespace Meta
         [NonAction]
         public virtual AcceptedAtActionResult AcceptedAtAction(string actionName, string controllerName)
         {
-            return AcceptedAtAction(actionName, controllerName, null!, null);
+            return AcceptedAtAction(actionName, controllerName, null!, null!);
         }
 
         /// <summary>
@@ -2096,7 +2089,7 @@ namespace Meta
         [NonAction]
         public virtual AcceptedAtActionResult AcceptedAtAction(string actionName, string controllerName, [ActionResultObjectValue] object routeValues)
         {
-            return AcceptedAtAction(actionName, controllerName, routeValues, null);
+            return AcceptedAtAction(actionName, controllerName, routeValues, null!);
         }
 
         /// <summary>
@@ -2137,7 +2130,7 @@ namespace Meta
         [NonAction]
         public virtual AcceptedAtRouteResult AcceptedAtRoute([ActionResultObjectValue] object routeValues)
         {
-            return AcceptedAtRoute(null!, routeValues, null);
+            return AcceptedAtRoute(null!, routeValues, null!);
         }
 
         /// <summary>
@@ -2149,7 +2142,7 @@ namespace Meta
         [NonAction]
         public virtual AcceptedAtRouteResult AcceptedAtRoute(string routeName)
         {
-            return AcceptedAtRoute(routeName, null!, null);
+            return AcceptedAtRoute(routeName, null!, null!);
         }
 
         /// <summary>
@@ -2162,7 +2155,7 @@ namespace Meta
         [NonAction]
         public virtual AcceptedAtRouteResult AcceptedAtRoute(string routeName, object routeValues)
         {
-            return AcceptedAtRoute(routeName, routeValues, null);
+            return AcceptedAtRoute(routeName, routeValues, null!);
         }
 
         /// <summary>
@@ -2589,7 +2582,7 @@ namespace Meta
             if (model == null)
                 throw new ArgumentNullException(nameof(model));
 
-            return TryValidateModel(model, null);
+            return TryValidateModel(model, null!);
         }
 
         /// <summary>
