@@ -10,6 +10,6 @@ namespace System
     {
         string GetToken(IdentityUser user);
 
-        IdentityUser GetUser(string token);
+        IdentityUser? GetUser(string token);
     }
 }
