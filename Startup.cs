@@ -84,7 +84,7 @@ namespace System
         [Description("DependencyInject")]
         private static IServiceCollection AutoInjection(this IServiceCollection serviceCollection)
         {
-            serviceCollection.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            serviceCollection.TryAddTransient<IHttpContextAccessor, HttpContextAccessor>();
             serviceCollection.TryAddScoped<IAccountService, AccountService>();
             serviceCollection.TryAddSingleton<IEncrypter, Encrypter>();
             serviceCollection.TryAddSingleton<IRedis>(RedisClient.Instance);
