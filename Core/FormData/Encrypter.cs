@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Meta.Contracts;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,48 +9,12 @@ using System.Text;
 
 namespace System
 {
-    public class Encrypter
+    public class Encrypter : IEncrypter
     {
-
-        #region ========加密========
-        private static string EncryptDES(string input, string key)
-        {
-            byte[] inputArray = Encoding.UTF8.GetBytes(input); var tripleDES = TripleDES.Create(); var byteKey = Encoding.UTF8.GetBytes(key); byte[] allKey = new byte[24]; Buffer.BlockCopy(byteKey, 0, allKey, 0, 16);
-            Buffer.BlockCopy(byteKey, 0, allKey, 16, 8);
-            tripleDES.Key = allKey;
-            tripleDES.Mode = CipherMode.ECB;
-            tripleDES.Padding = PaddingMode.PKCS7;
-            ICryptoTransform cTransform = tripleDES.CreateEncryptor(); 
-            byte[] resultArray = cTransform.TransformFinalBlock(inputArray, 0, inputArray.Length); 
-            return Convert.ToBase64String(resultArray, 0, resultArray.Length);
-        }
-        #endregion
-
-        #region ========解密========
-        private static string DecryptDES(string input, string key)
-        {
-            byte[] inputArray = Convert.FromBase64String(input); var tripleDES = TripleDES.Create(); var byteKey = Encoding.UTF8.GetBytes(key); byte[] allKey = new byte[24]; Buffer.BlockCopy(byteKey, 0, allKey, 0, 16);
-            Buffer.BlockCopy(byteKey, 0, allKey, 16, 8);
-            tripleDES.Key = allKey;
-            tripleDES.Mode = CipherMode.ECB;
-            tripleDES.Padding = PaddingMode.PKCS7;
-            ICryptoTransform cTransform = tripleDES.CreateDecryptor(); 
-            byte[] resultArray = cTransform.TransformFinalBlock(inputArray, 0, inputArray.Length); 
-            return Encoding.UTF8.GetString(resultArray);
-        }
-        #endregion
-
         #region ========MD5 Encrypt & Decrypt========
 
-        /// <summary> 
-        /// 加密数据 
-        /// </summary> 
-        /// <param name="Text"></param> 
-        /// <param name="sKey"></param> 
-        /// <returns></returns> 
-        public static string EncryptMD5(string Text, string sKey)
+        public string Encrypt(string Text, string sKey)
         {
-#pragma warning disable SYSLIB0021 // 类型或成员已过时
             using DESCryptoServiceProvider des = new();
             byte[] inputByteArray;
             inputByteArray = Encoding.Default.GetBytes(Text);
@@ -65,21 +30,13 @@ namespace System
                 ret.AppendFormat("{0:X2}", b);
             }
             return ret.ToString();
-#pragma warning restore SYSLIB0021 // 类型或成员已过时
         }
 
 
-        /// <summary> 
-        /// 解密数据 
-        /// </summary> 
-        /// <param name="Text"></param> 
-        /// <param name="sKey"></param> 
-        /// <returns></returns> 
-        public static string DecryptMD5(string Text, string sKey)
+        public string Decrypt(string Text, string sKey)
         {
             try
             {
-#pragma warning disable SYSLIB0021 // 类型或成员已过时
                 using DESCryptoServiceProvider des = new();
                 int len;
                 len = Text.Length / 2;
@@ -100,7 +57,6 @@ namespace System
                 cs.Write(inputByteArray, 0, inputByteArray.Length);
                 cs.FlushFinalBlock();
                 return Encoding.Default.GetString(ms.ToArray());
-#pragma warning restore SYSLIB0021 // 类型或成员已过时
             }
             catch (Exception)
             {
@@ -113,9 +69,8 @@ namespace System
         /// </summary>
         /// <param name="input"></param>
         /// <returns></returns>
-        public static string Md5Hash(string input)
+        private string Md5Hash(string input)
         {
-#pragma warning disable SYSLIB0021 // 类型或成员已过时
             using MD5CryptoServiceProvider md5Hasher = new();
             byte[] data = md5Hasher.ComputeHash(Encoding.Default.GetBytes(input));
             StringBuilder sBuilder = new();
@@ -124,7 +79,6 @@ namespace System
                 sBuilder.Append(data[i].ToString("x2"));
             }
             return sBuilder.ToString();
-#pragma warning restore SYSLIB0021 // 类型或成员已过时
         }
         #endregion
     }

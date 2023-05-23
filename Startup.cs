@@ -86,6 +86,7 @@ namespace System
         {
             serviceCollection.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             serviceCollection.TryAddScoped<IAccountService, AccountService>();
+            serviceCollection.TryAddSingleton<IEncrypter, Encrypter>();
             serviceCollection.TryAddSingleton<IRedis>(RedisClient.Instance);
             serviceCollection.TryAddSingleton<IEmail, Email>();
             serviceCollection.TryAddSingleton<ITencentSMS, TencentSMS>();

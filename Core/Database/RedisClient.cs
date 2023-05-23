@@ -52,8 +52,17 @@ namespace System
                     item.Close();
         }
 
-        public static async Task<T> Get<T>(string key) 
-            => JsonConvert.DeserializeObject<T>(await Instance.RedisDB.StringGetAsync(key))!;
+        public static async Task<T> Get<T>(string key)
+        {
+            try
+            {
+                return JsonConvert.DeserializeObject<T>(await Instance.RedisDB.StringGetAsync(key)) ?? default!;
+            }
+            catch (Exception)
+            {
+                return default!;
+            }
+        }
 
         public static Task<bool> Set<T>(string key, T val, int expireSecond = -1)
             => Instance.RedisDB.StringSetAsync(key, JsonConvert.SerializeObject(val), expireSecond == -1 ? null : TimeSpan.FromSeconds(expireSecond));

@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc.Filters;
+﻿using Meta.Contracts;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Filters;
 using System.ComponentModel;
 
 namespace System
@@ -8,7 +11,7 @@ namespace System
     /// </summary>
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = false)]
     [Description("账户权限")]
-    public class Authorize : ActionFilterAttribute//, IAuthorizeData
+    public class Authorize : ActionFilterAttribute, IAuthorizeData
     {
         /// <summary>
         /// Gets or sets the policy name that determines access to the resource.
@@ -34,8 +37,10 @@ namespace System
         [Description("执行前")]
         public override void OnActionExecuting(ActionExecutingContext context)
         {
-            var user = CacheServer.Find(context.HttpContext.Connection.Id);
-            if (user.Id == 0)
+            var authorization = context.HttpContext.Request.Headers["AuthorMeta"];
+            var auto = context.ActionDescriptor;
+            var user = ServiceProvider.GetService<IAuthorizer>()?.GetUser(authorization!);
+            if (user is null || user.Id == 0)
             {
                 context.MapError(StatusCode.UnAuthorize, "State Un-Login", "Loginned Required");
                 return;
