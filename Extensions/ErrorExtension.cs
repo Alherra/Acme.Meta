@@ -60,5 +60,26 @@ namespace System
             });
             context.HttpContext.Response.StatusCode = (int)status;
         }
+
+        /// <summary>
+        /// Reset the error outputs.
+        /// 
+        /// 配置异常信息
+        /// </summary>
+        [Description("配置异常信息")]
+        public static void MapError(this AuthorizationFilterContext context, StatusCode status, string message, string details, string code = "")
+        {
+            DbScoped.SugarScope.RollbackTran();
+            context.Result = new JsonResult(new
+            {
+                Error = new
+                {
+                    Code = string.IsNullOrEmpty(code) ? status.ToString() : code,
+                    Message = string.IsNullOrEmpty(message) ? status.ToString() : message,
+                    Details = string.IsNullOrEmpty(details) ? status.ToString() : details
+                }
+            });
+            context.HttpContext.Response.StatusCode = (int)status;
+        }
     }
 }

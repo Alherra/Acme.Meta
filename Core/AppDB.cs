@@ -27,7 +27,7 @@ namespace System
         /// <summary>
         /// 当前用户信息
         /// </summary>
-        private static CacheUser User => CacheServer.Find(ServiceProvider.HttpContext.Connection.Id);
+        private static UserInfo? User => JsonConvert.DeserializeObject<UserInfo>(ServiceProvider.GetService<IHttpContextAccessor>()?.HttpContext.User.Claims.SingleOrDefault(c => c.Type == "CurrentUser")?.Value! ?? string.Empty);
 
         /// <summary>
         /// 是否开启事务
@@ -82,12 +82,12 @@ namespace System
         /// <typeparam name="TabelClass">表数据类</typeparam>
         /// <returns></returns>
         /// <remarks>自动化过滤</remarks>
-        public ISugarQueryable<TabelClass> Queryable<TabelClass>()
+        public ISugarQueryable<TabelClass> Queryable<TabelClass>(params Type[] ignores)
         {
             var queryable = _db.Queryable<TabelClass>();
             var list = new List<IConditionalModel>();
             var type = typeof(TabelClass);
-            if (type.IsAssignableTo(typeof(ISoftDelete)))
+            if (type.IsAssignableTo(typeof(ISoftDelete)) && !ignores.Contains(typeof(ISoftDelete)))
             {
                 /**************    软删除    ***************/
                 list.Add(new ConditionalModel
@@ -96,13 +96,13 @@ namespace System
                     ConditionalType = ConditionalType.EqualNull
                 });
             }
-            if (type.IsAssignableTo(typeof(IMultiTenant)))
+            if (type.IsAssignableTo(typeof(IMultiTenant)) && !ignores.Contains(typeof(IMultiTenant)))
                 list.Add(new ConditionalModel
                 {
                     FieldName = "TenantId",
-                    ConditionalType = ConditionalType.EqualNull,
-                    FieldValue = User.TenantId.ToString(),
-                    FieldValueConvertFunc = it => Convert.ToInt64(it)
+                    ConditionalType = ConditionalType.Equal,
+                    FieldValue = (User?.TenantId ?? 0).ToString(),
+                    FieldValueConvertFunc = it => Convert.ToInt32(it)
                 });
             return queryable.Where(list);
         }
@@ -123,13 +123,13 @@ namespace System
             if (type.IsAssignableTo(typeof(ICreationAudited)))
             {
                 type.GetProperty("CreatedTime")?.SetValue(data, DateTime.Now);
-                type.GetProperty("CreatorId")?.SetValue(data, User.Id);
+                type.GetProperty("CreatorId")?.SetValue(data, User?.Id ?? 0);
             }
             else if (type.IsAssignableTo(typeof(ICreatedTime)))
                 type.GetProperty("CreatedTime")?.SetValue(data, DateTime.Now);
 
             if (type.IsAssignableTo(typeof(IMultiTenant)))
-                type.GetProperty("TenantId")?.SetValue(data, User.TenantId);
+                type.GetProperty("TenantId")?.SetValue(data, User?.TenantId ?? 0);
             #endregion
 
             #region Id Check
@@ -161,13 +161,13 @@ namespace System
                 if (type.IsAssignableTo(typeof(ICreationAudited)))
                 {
                     type.GetProperty("CreatedTime")?.SetValue(data, DateTime.Now);
-                    type.GetProperty("CreatorId")?.SetValue(data, User.Id);
+                    type.GetProperty("CreatorId")?.SetValue(data, User?.Id ?? 0);
                 }
                 else if (type.IsAssignableTo(typeof(ICreatedTime)))
                     type.GetProperty("CreatedTime")?.SetValue(data, DateTime.Now);
 
                 if (type.IsAssignableTo(typeof(IMultiTenant)))
-                    type.GetProperty("TenantId")?.SetValue(data, User.TenantId);
+                    type.GetProperty("TenantId")?.SetValue(data, User?.TenantId ?? 0);
                 #endregion
             }
 
@@ -192,13 +192,13 @@ namespace System
                 if (type.IsAssignableTo(typeof(ICreationAudited)))
                 {
                     type.GetProperty("CreatedTime")?.SetValue(data, DateTime.Now);
-                    type.GetProperty("CreatorId")?.SetValue(data, User.Id);
+                    type.GetProperty("CreatorId")?.SetValue(data, User?.Id ?? 0);
                 }
                 else if (type.IsAssignableTo(typeof(ICreatedTime)))
                     type.GetProperty("CreatedTime")?.SetValue(data, DateTime.Now);
 
                 if (type.IsAssignableTo(typeof(IMultiTenant)))
-                    type.GetProperty("TenantId")?.SetValue(data, User.TenantId);
+                    type.GetProperty("TenantId")?.SetValue(data, User?.TenantId ?? 0);
                 #endregion
             }
 
@@ -224,7 +224,7 @@ namespace System
                 foreach (var data in datas)
                 {
                     type.GetProperty("LastModificationTime")?.SetValue(data, DateTime.Now);
-                    type.GetProperty("LastModifierId")?.SetValue(data, User.Id);
+                    type.GetProperty("LastModifierId")?.SetValue(data, User?.Id ?? 0);
                 }
             }
 
@@ -280,7 +280,7 @@ namespace System
             Type type = typeof(TabelClass);
 
             if (type.IsAssignableTo(typeof(IDeletionAudited)))
-                return _db.Updateable<TabelClass>(new { DeletedTime = DateTime.Now, DeleterId = User.Id }).Where("Id IN (" + String.Join(",", ids.Select(key => "'" + key + "'")) + ")").ExecuteCommandHasChangeAsync();
+                return _db.Updateable<TabelClass>(new { DeletedTime = DateTime.Now, DeleterId = User?.Id ?? 0 }).Where("Id IN (" + String.Join(",", ids.Select(key => "'" + key + "'")) + ")").ExecuteCommandHasChangeAsync();
             else if (type.IsAssignableTo(typeof(ISoftDelete)))
                 return _db.Updateable<TabelClass>(new { DeletedTime = DateTime.Now }).Where("Id IN (" + String.Join(",", ids.Select(key => "'" + key + "'")) + ")").ExecuteCommandHasChangeAsync();
             else
@@ -298,10 +298,19 @@ namespace System
         {
             Type type = typeof(TabelClass);
 
+            var list = new List<IConditionalModel>();
+            if (type.IsAssignableTo(typeof(ISoftDelete)))
+            {
+                list.Add(new ConditionalModel
+                {
+                    FieldName = "DeletedTime",
+                    ConditionalType = ConditionalType.EqualNull
+                });
+            }
             if (type.IsAssignableTo(typeof(IDeletionAudited)))
-                return _db.Updateable<TabelClass>(new { DeletedTime = DateTime.Now, DeleterId = User.Id }).Where("DeletedTime IS NULL").Where(condition).ExecuteCommandHasChangeAsync();
+                return _db.Updateable<TabelClass>(new { DeletedTime = DateTime.Now, DeleterId = User?.Id ?? 0 }).Where(list).Where(condition).ExecuteCommandHasChangeAsync();
             else if (type.IsAssignableTo(typeof(ISoftDelete)))
-                return _db.Updateable<TabelClass>(new { DeletedTime = DateTime.Now }).Where("DeletedTime IS NULL").Where(condition).ExecuteCommandHasChangeAsync();
+                return _db.Updateable<TabelClass>(new { DeletedTime = DateTime.Now }).Where(list).Where(condition).ExecuteCommandHasChangeAsync();
             else
                 return _db.Deleteable<TabelClass>().Where(condition).ExecuteCommandHasChangeAsync();
         }

@@ -1,5 +1,4 @@
-﻿using Meta.Contracts;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,13 +17,13 @@ namespace System
             using DESCryptoServiceProvider des = new();
             byte[] inputByteArray;
             inputByteArray = Encoding.Default.GetBytes(Text);
-            des.Key = ASCIIEncoding.ASCII.GetBytes(Md5Hash(sKey).Substring(0, 8));
-            des.IV = ASCIIEncoding.ASCII.GetBytes(Md5Hash(sKey).Substring(0, 8));
+            des.Key = ASCIIEncoding.ASCII.GetBytes(Md5Hash(sKey)[..8]);
+            des.IV = ASCIIEncoding.ASCII.GetBytes(Md5Hash(sKey)[..8]);
             System.IO.MemoryStream ms = new();
             CryptoStream cs = new(ms, des.CreateEncryptor(), CryptoStreamMode.Write);
             cs.Write(inputByteArray, 0, inputByteArray.Length);
             cs.FlushFinalBlock();
-            StringBuilder ret = new StringBuilder();
+            StringBuilder ret = new();
             foreach (byte b in ms.ToArray())
             {
                 ret.AppendFormat("{0:X2}", b);
@@ -69,7 +68,7 @@ namespace System
         /// </summary>
         /// <param name="input"></param>
         /// <returns></returns>
-        private string Md5Hash(string input)
+        public string Md5Hash(string input)
         {
             using MD5CryptoServiceProvider md5Hasher = new();
             byte[] data = md5Hasher.ComputeHash(Encoding.Default.GetBytes(input));

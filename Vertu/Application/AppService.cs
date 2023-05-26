@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Newtonsoft.Json;
 using System.ComponentModel;
 
 namespace System
@@ -14,7 +15,8 @@ namespace System
         /// CurrentUser
         /// </summary>
         [Description("CurrentUser")]
-        protected CacheUser CurrentUser => CacheServer.Find(ServiceProvider.HttpContext.Connection.Id);
+        protected UserInfo? CurrentUser 
+            => JsonConvert.DeserializeObject<UserInfo>(ServiceProvider.GetService<IHttpContextAccessor>()?.HttpContext.User.Claims.SingleOrDefault(c => c.Type == "CurrentUser")?.Value! ?? string.Empty);
 
         /// <summary>
         /// Creates an instance of the specified type using that type's parameterless constructor.

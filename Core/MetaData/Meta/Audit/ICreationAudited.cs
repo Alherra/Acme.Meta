@@ -19,6 +19,6 @@ namespace System
         /// </summary>
         [SugarColumn(ColumnDescription = "创建者ID", IsOnlyIgnoreUpdate = true)]
         [Description("创建者ID")]
-        public long CreatorId { get; set; }
+        public int CreatorId { get; set; }
     }
 }

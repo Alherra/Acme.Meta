@@ -8,8 +8,8 @@ namespace System
 {
     public interface IAuthorizer
     {
-        string GetToken(IdentityUser user);
+        string GetToken(UserInfo user);
 
-        IdentityUser? GetUser(string token);
+        UserInfo? GetUser(string? token);
     }
 }

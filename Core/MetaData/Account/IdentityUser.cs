@@ -9,44 +9,58 @@ using System.Threading.Tasks;
 namespace System
 {
     /// <summary>
-    /// 账户
+    /// User acount
     /// </summary>
-    [SugarTable("Account", tableDescription: "账户")]
-    public class IdentityUser : Meta<long>
+    [SugarTable("T_System_Account", tableDescription: "User acount")]
+    public class IdentityUser : AuditModel, IMultiTenant
     {
         /// <summary>
-        /// 用户名
+        /// UserName
         /// </summary>
-        [SugarColumn(Length = 32, ColumnDescription = "用户名")]
-        [Description("用户名")]
+        [SugarColumn(Length = 32, ColumnDescription = "UserName")]
+        [Description("UserName")]
         public virtual string UserName { get; set; }
 
         /// <summary>
-        /// 密码
+        /// Password
         /// </summary>
-        [SugarColumn(Length = 32, ColumnDescription = "密码")]
-        [Description("密码")]
+        [SugarColumn(Length = 32, ColumnDescription = "Password")]
+        [Description("Password")]
         public virtual string Password { get; set; }
 
         /// <summary>
-        /// 电子邮件
+        /// E-mail
         /// </summary>
-        [SugarColumn(Length = 32, ColumnDescription = "电子邮件")]
-        [Description("电子邮件")]
+        [SugarColumn(Length = 32, ColumnDescription = "E-mail")]
+        [Description("E-mail")]
         public string Email { get; set; }
 
         /// <summary>
-        /// 手机号码
+        /// PhoneNumber
         /// </summary>
-        [SugarColumn(Length = 16, ColumnDescription = "手机号码")]
-        [Description("手机号码")]
+        [SugarColumn(Length = 16, ColumnDescription = "PhoneNumber")]
+        [Description("PhoneNumber")]
         public string PhoneNumber { get; set; }
 
         /// <summary>
-        /// 上次在线时间
+        /// Enable
         /// </summary>
-        [SugarColumn(ColumnDescription = "上次在线时间", IsNullable = true)]
-        [Description("上次在线时间")]
+        [SugarColumn(ColumnDescription = "Enable")]
+        [Description("Enable")]
+        public virtual bool IsEnable { get; set; }
+
+        /// <summary>
+        /// OnlineTime
+        /// </summary>
+        [SugarColumn(ColumnDescription = "OnlineTime", IsNullable = true)]
+        [Description("OnlineTime")]
         public virtual DateTime LastLogOut { get; set; }
+
+        /// <summary>
+        /// Id of the related tenant.
+        /// </summary>
+        [SugarColumn(ColumnDescription = "TenantId", IsNullable = true)]
+        [Description("Id of the related tenant.")]
+        public int TenantId { get; set; }
     }
 }

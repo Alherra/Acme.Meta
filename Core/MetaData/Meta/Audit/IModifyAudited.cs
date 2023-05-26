@@ -26,6 +26,6 @@ namespace System
         /// 获取或设置 更新者ID
         /// </summary>
         [Description("更新者ID")]
-        public long LastModifierId { get; set; }
+        public int LastModifierId { get; set; }
     }
 }

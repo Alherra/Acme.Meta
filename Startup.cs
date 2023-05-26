@@ -19,46 +19,55 @@ namespace System
     public static class Startup
     {
         /// <summary>
-        /// 启用Meta
+        /// Configuration
         /// </summary>
         /// <param name="services"></param>
         /// <returns></returns>
-        [Description("启用Meta")]
+        [Description("Start Meta")]
         public static IServiceCollection RunMeta(this IServiceCollection services)
         {
             #region SqlSugar Ioc
-            // 注入 ORM
-            services.AddSqlSugar(new IocConfig()
-            {
-                ConnectionString = AppSetting.Get("ConnectionStrings.Default"),
-                DbType = (IocDbType)Enum.Parse(typeof(IocDbType), AppSetting.Get("ConnectionStrings.DbType")),
-                IsAutoCloseConnection = false//自动释放
-            });
 
-            // 设置参数
-            services.ConfigurationSugar(db =>
+            var connectionString = AppSetting.Get("ConnectionStrings.Default");
+            if (!string.IsNullOrEmpty(connectionString))
             {
-                db.Aop.OnLogExecuting = (sql, p) =>
+                var dbType = AppSetting.Get("ConnectionStrings.DbType");
+                if (!string.IsNullOrEmpty(dbType))
                 {
-                    foreach (var pv in p)
-                        sql = sql.Replace(pv.ParameterName, "\"" + pv.Value + "\"");
+                    // Inject ORM
+                    services.AddSqlSugar(new IocConfig()
+                    {
+                        ConnectionString = connectionString,
+                        DbType = (IocDbType)Enum.Parse(typeof(IocDbType), dbType),
+                        IsAutoCloseConnection = false
+                    });
 
-                    MetaLogger.Db(sql);
-                };
-                //设置更多连接参数
-                //db.CurrentConnectionConfig.XXXX=XXXX
-                //db.CurrentConnectionConfig.MoreSetting=new MoreSetting(){}
-                //读写分离等都在这儿设置
-            });
+                    // Config orm
+                    services.ConfigurationSugar(db =>
+                    {
+                        db.Aop.OnLogExecuting = (sql, p) =>
+                        {
+                            foreach (var pv in p)
+                                sql = sql.Replace(pv.ParameterName, "\"" + pv.Value + "\"");
+
+                            MetaLogger.Db(sql);
+                        };
+                        //设置更多连接参数
+                        //db.CurrentConnectionConfig.XXXX=XXXX
+                        //db.CurrentConnectionConfig.MoreSetting=new MoreSetting(){}
+                        //读写分离等都在这儿设置
+                    });
+                }
+            }
             #endregion
 
-            // 依赖注入
+            // DependencyInject
             services.AutoInjection();
 
-            // 初始化数据表
+            // Init database tables
             services.InitSugarTables();
 
-            // 配置Redis缓存
+            // Config redis
             if (!string.IsNullOrEmpty(AppSetting.Get("Redis.Configuration")))
             {
                 services.AddStackExchangeRedisCache(options =>
@@ -84,14 +93,14 @@ namespace System
         [Description("DependencyInject")]
         private static IServiceCollection AutoInjection(this IServiceCollection serviceCollection)
         {
-            serviceCollection.TryAddTransient<IHttpContextAccessor, HttpContextAccessor>();
+            serviceCollection.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             serviceCollection.TryAddScoped<IAccountService, AccountService>();
             serviceCollection.TryAddSingleton<IEncrypter, Encrypter>();
             serviceCollection.TryAddSingleton<IRedis>(RedisClient.Instance);
             serviceCollection.TryAddSingleton<IEmail, Email>();
             serviceCollection.TryAddSingleton<ITencentSMS, TencentSMS>();
 
-            #region 查询依赖注入特性配置
+            #region Config Dependencies
             var services = Directory.GetFiles(AppContext.BaseDirectory, "*.dll")
                 .Select(Assembly.LoadFile)
                 .SelectMany(a => a.GetTypes())
@@ -125,13 +134,11 @@ namespace System
         }
 
         /// <summary>
-        /// 更新数据表结构
-        /// 
         /// Initial Database
         /// </summary>
         /// <param name="services"></param>
         /// <returns></returns>
-        [Description("更新数据表结构")]
+        [Description("Refresh tables")]
         private static IServiceCollection InitSugarTables(this IServiceCollection services)
         {
             Task.Run(() =>

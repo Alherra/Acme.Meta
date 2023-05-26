@@ -26,5 +26,12 @@ namespace System
         /// <param name="sKey"></param> 
         /// <returns></returns> 
         string Decrypt(string Text, string sKey);
+
+        /// <summary>
+        /// GetMD5hash
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        string Md5Hash(string input);
     }
 }

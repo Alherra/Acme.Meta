@@ -7,6 +7,7 @@ namespace System
     /// ApiControllerBase
     /// </summary>
     [ApiController]
-    [Route("[controller]/[action]")]
+    [Authorization]
+    [Route("api/[controller]/[action]")]
     public abstract class WebAPI : Meta.MetaController { }
 }

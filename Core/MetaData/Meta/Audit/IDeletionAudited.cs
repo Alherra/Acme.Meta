@@ -19,6 +19,6 @@ namespace System
         /// </summary>
         [SugarColumn(ColumnDescription = "删除操作人ID", IsNullable = true)]
         [Description("DeleterUserId")]
-        long? DeleterId { get; set; }
+        int? DeleterId { get; set; }
     }
 }

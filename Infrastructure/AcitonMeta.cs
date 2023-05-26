@@ -54,35 +54,6 @@ namespace System
                 MetaLogger.Request($"Request: {context.HttpContext.TraceIdentifier}\n{request.Method} {request.Path}{request.QueryString}\n");
                 var db = DbScoped.SugarScope;
                 var key = context.HttpContext.Connection.Id;
-                if (!CacheServer.HasToken(key))
-                {
-                    try
-                    {
-                        var tokenCookie = request.Cookies["token"];
-                        var tokenHeaders = request.Headers["AuthorMeta"];
-                        if (!string.IsNullOrEmpty(tokenCookie))
-                        {
-                            var userName = Encrypter.DecryptMD5(tokenCookie, ip?.Replace(",", "")!);
-
-                            if (!string.IsNullOrEmpty(userName))
-                            {
-                                if (long.TryParse(userName.AsSpan(0, userName.Length - 3), out var id) && id > 0)
-                                    CacheServer.SetUser(key, db.Queryable<IdentityUser>().Single(x => x.Id == id), ip!);
-                            }
-                        }
-                        else if (!string.IsNullOrEmpty(tokenHeaders))
-                        {
-                            var userName = Encrypter.DecryptMD5(tokenHeaders!, ip?.Replace(",", "")!);
-
-                            if (!string.IsNullOrEmpty(userName))
-                            {
-                                if (long.TryParse(userName.AsSpan(0, userName.Length - 3), out var id) && id > 0)
-                                    CacheServer.SetUser(key, db.Queryable<IdentityUser>().Single(x => x.Id == id), ip!);
-                            }
-                        }
-                    }
-                    catch (Exception) { }
-                }
 
                 //base.OnActionExecuting(context);
                 try

@@ -337,7 +337,7 @@ namespace System
             });
             #endregion
 
-            string fileName = Encrypter.Md5Hash(Encoding.ASCII.GetString(bytes));
+            string fileName = Activator.CreateInstance<IEncrypter>().Md5Hash(Encoding.ASCII.GetString(bytes));
 
             var filepath = Path.Combine(directory, ext, fileName + ext);
 

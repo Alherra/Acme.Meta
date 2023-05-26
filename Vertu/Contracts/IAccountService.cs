@@ -14,29 +14,21 @@ namespace System
     public interface IAccountService
     {
         /// <summary>
-        /// 登录
+        /// SignIn
         /// </summary>
-        [Description("登录")]
-        Task<IdentityUser> Login(string account, string pwd);
+        [Description("SignIn")]
+        Task<IdentityUser> SignIn(string account, string pwd);
 
         /// <summary>
-        /// 注册
+        /// Register
         /// </summary>
-        /// <param name="user"></param>
-        /// <returns></returns>
-        [Description("注册")]
+        [Description("Register")]
         Task<bool> Register(RegisterInput user);
 
         /// <summary>
-        /// 获取用户
+        /// UserInfo
         /// </summary>
-        [Description("获取用户")]
+        [Description("UserInfo")]
         Task<IdentityUser> GetUserAsync(string username);
-
-        /// <summary>
-        /// 活跃连接
-        /// </summary>
-        [Description("活跃连接")]
-        Task<bool> KeepAliveInterval();
     }
 }

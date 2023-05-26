@@ -8,21 +8,21 @@ using System.Threading.Tasks;
 namespace System
 {
     /// <summary>
-    /// 账户权限
+    /// Option policy
     /// </summary>
-    [SugarTable("UserOption", tableDescription: "账户权限")]
+    [SugarTable("UserOption", tableDescription: "Option policy")]
     public class UserOption : Meta<long>
     {
         /// <summary>
-        /// 用户ID
+        /// UserId
         /// </summary>
         [SugarColumn(ColumnName = "UserId", ColumnDescription = "UserId")]
         public long UserId { get; set; }
 
         /// <summary>
-        /// 接口
+        /// Policy
         /// </summary>
-        [SugarColumn(ColumnName = "Action", ColumnDescription = "Action")]
-        public string Action { get; set; } = String.Empty;
+        [SugarColumn(ColumnName = "Policy", ColumnDescription = "Policy")]
+        public string Policy { get; set; } = String.Empty;
     }
 }
