@@ -1,30 +1,18 @@
 ﻿using Microsoft.AspNetCore.Mvc.Filters;
-using SqlSugar.IOC;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
-using TencentCloud.Mna.V20210119.Models;
 
 namespace System
 {
     /// <summary>
     /// Extensions for http errors.
-    /// 
-    /// 异常处理扩展
     /// </summary>
-    [Description("异常处理扩展")]
-    public static class ErrorExtension
+    [Description("Extensions for http errors")]
+    public static class HttpErrorExtension
     {
         /// <summary>
-        /// Reset the error outputs.
-        /// 
-        /// 配置异常信息
+        /// ActionExecutingContextError
         /// </summary>
-        [Description("配置异常信息")]
+        [Description("ActionExecutingContextError")]
         public static void MapError(this ActionExecutingContext context, StatusCode status, string message, string details, string code = "")
         {
             context.Result = new JsonResult(new
@@ -40,11 +28,9 @@ namespace System
         }
 
         /// <summary>
-        /// Reset the error outputs.
-        /// 
-        /// 配置异常信息
+        /// ActionExecutedContextError
         /// </summary>
-        [Description("配置异常信息")]
+        [Description("ActionExecutedContextError")]
         public static void MapError(this ActionExecutedContext context, StatusCode status, string message = "", string details = "", string code = "")
         {
             context.Result = new JsonResult(new
@@ -60,11 +46,9 @@ namespace System
         }
 
         /// <summary>
-        /// Reset the error outputs.
-        /// 
-        /// 配置异常信息
+        /// AuthorizationFilterContextError
         /// </summary>
-        [Description("配置异常信息")]
+        [Description("AuthorizationFilterContextError")]
         public static void MapError(this AuthorizationFilterContext context, StatusCode status, string message, string details, string code = "")
         {
             context.Result = new JsonResult(new

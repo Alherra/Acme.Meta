@@ -1,15 +1,13 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using System.Linq.Expressions;
 using Newtonsoft.Json;
-using System.Security.Claims;
 using SqlSugar;
-using SqlSugar.IOC;
 using Microsoft.AspNetCore.Http;
 
 namespace System
 {
     /// <summary>
-    /// 数据应用功能
+    /// DB Application
     /// 
     /// Example:
     ///     (Sync): 
@@ -20,17 +18,26 @@ namespace System
     public class AppDB : IDisposable
     {
         /// <summary>
-        /// Sugar 客户端
+        /// Sugar Client
         /// </summary>
-        private readonly SqlSugarScope _db = DbScoped.SugarScope;
+        private readonly SqlSugarClient _db = DbService.Client;
+
+        private UserInfo? _user;
 
         /// <summary>
-        /// 当前用户信息
+        /// Current user
         /// </summary>
-        private static UserInfo? User => JsonConvert.DeserializeObject<UserInfo>(ServiceProvider.GetService<IHttpContextAccessor>()?.HttpContext.User.Claims.SingleOrDefault(c => c.Type == "CurrentUser")?.Value! ?? string.Empty);
+        private UserInfo? User
+        {
+            get
+            {
+                _user ??= JsonConvert.DeserializeObject<UserInfo>(ServiceProvider.GetService<IHttpContextAccessor>()?.HttpContext.User.Claims.SingleOrDefault(c => c.Type == "CurrentUser")?.Value! ?? string.Empty);
+                return _user;
+            }
+        }
 
         /// <summary>
-        /// 是否开启事务
+        /// If begin tran
         /// </summary>
         private readonly bool _doTran;
 
@@ -45,25 +52,25 @@ namespace System
         private Exception? _exception = null;
 
         /// <summary>
-        /// 执行代码块
+        /// Execute func with db
         /// </summary>
-        /// <typeparam name="TResult">返回结果类型</typeparam>
-        /// <param name="func">待执行的代码块包装方法</param>
-        /// <param name="doTran">是否开启事务</param>
-        /// <returns>代码块执行结果</returns>
+        /// <typeparam name="TResult">Type of result</typeparam>
+        /// <param name="func">Function codes</param>
+        /// <param name="doTran">If use the tran</param>
+        /// <returns></returns>
         public static async Task<TResult> Execute<TResult>(Func<AppDB, Task<TResult>> func, bool doTran = true)
         {
-            // 创建实例
+            // Create an instance
             using var db = new AppDB(doTran);
 
             try
             {
-                // 执行并等待析构提交
+                // Execute
                 return await func(db);
             }
             catch (Exception ex)
             {
-                // 回滚数据并抛出异常
+                // Rollback and throw the exception
                 db.ThrowException(ex);
                 throw;
             }
@@ -77,19 +84,18 @@ namespace System
 
         #region Query
         /// <summary>
-        /// 单表查询功能
+        /// ISugarQueryable
         /// </summary>
-        /// <typeparam name="TabelClass">表数据类</typeparam>
+        /// <typeparam name="TableClass">Table</typeparam>
         /// <returns></returns>
-        /// <remarks>自动化过滤</remarks>
-        public ISugarQueryable<TabelClass> Queryable<TabelClass>(params Type[] ignores)
+        /// <remarks>Auto filter</remarks>
+        public ISugarQueryable<TableClass> Queryable<TableClass>(params Type[] ignores)
         {
-            var queryable = _db.Queryable<TabelClass>();
+            var queryable = _db.Queryable<TableClass>();
             var list = new List<IConditionalModel>();
-            var type = typeof(TabelClass);
+            var type = typeof(TableClass);
             if (type.IsAssignableTo(typeof(ISoftDelete)) && !ignores.Contains(typeof(ISoftDelete)))
             {
-                /**************    软删除    ***************/
                 list.Add(new ConditionalModel
                 {
                     FieldName = "DeletedTime",
@@ -110,15 +116,15 @@ namespace System
 
         #region Insert
         /// <summary>
-        /// 插入数据
+        /// Insert data
         /// </summary>
-        /// <typeparam name="TabelClass">表数据类</typeparam>
-        /// <param name="datas">待插入数据</param>
+        /// <typeparam name="TableClass">Table</typeparam>
+        /// <param name="datas">Data to insert</param>
         /// <returns></returns>
-        public async Task<bool> Insert<TabelClass>(TabelClass data)
-            where TabelClass : class, new()
+        public async Task<bool> Insert<TableClass>(TableClass data)
+            where TableClass : class, new()
         {
-            Type type = typeof(TabelClass);
+            Type type = typeof(TableClass);
             #region Audit
             if (type.IsAssignableTo(typeof(ICreationAudited)))
             {
@@ -135,7 +141,7 @@ namespace System
             #region Id Check
             var prop = type.GetProperty("Id");
             if (prop?.PropertyType == typeof(Guid))
-                while (Queryable<TabelClass>().Where("Id='" + prop.GetValue(data) + "'").Any())
+                while (Queryable<TableClass>().Where("Id='" + prop.GetValue(data) + "'").Any())
                 {
                     prop.SetValue(data, Guid.NewGuid());
                 }
@@ -145,16 +151,16 @@ namespace System
         }
 
         /// <summary>
-        /// 插入数据
+        /// Insert data
         /// </summary>
-        /// <typeparam name="TabelClass">表数据类</typeparam>
-        /// <param name="datas">待插入数据</param>
+        /// <typeparam name="TableClass">Table</typeparam>
+        /// <param name="datas">Data to insert</param>
         /// <returns></returns>
-        public Task<int> Insert<TabelClass>(params TabelClass[] datas)
-            where TabelClass : class, new()
+        public Task<int> Insert<TableClass>(params TableClass[] datas)
+            where TableClass : class, new()
         {
-            Type type = typeof(TabelClass);
-            // 审计信息
+            Type type = typeof(TableClass);
+            // Audit
             foreach (var data in datas)
             {
                 #region Audit
@@ -171,21 +177,21 @@ namespace System
                 #endregion
             }
 
-            // 插入方法
+            // Insert
             return _db.Insertable(datas).ExecuteCommandAsync();
         }
 
         /// <summary>
-        /// 插入数据
+        /// Insert data
         /// </summary>
-        /// <typeparam name="TabelClass">表数据类</typeparam>
-        /// <param name="datas">待插入数据</param>
+        /// <typeparam name="TableClass">Table</typeparam>
+        /// <param name="datas">Data to insert</param>
         /// <returns></returns>
-        public Task<int> Insert<TabelClass>(IEnumerable<TabelClass> datas)
-            where TabelClass : class, new()
+        public Task<int> Insert<TableClass>(IEnumerable<TableClass> datas)
+            where TableClass : class, new()
         {
-            Type type = typeof(TabelClass);
-            // 审计信息
+            Type type = typeof(TableClass);
+            // Audit
             foreach (var data in datas)
             {
                 #region Audit
@@ -202,23 +208,23 @@ namespace System
                 #endregion
             }
 
-            // 插入方法
+            // Insert
             return _db.Insertable(datas.ToArray()).ExecuteCommandAsync();
         }
         #endregion
 
         #region Update
         /// <summary>
-        /// 更新数据
+        /// Update data
         /// </summary>
-        /// <typeparam name="TabelClass">表数据类</typeparam>
-        /// <param name="datas">待更新数据</param>
+        /// <typeparam name="TableClass">Table</typeparam>
+        /// <param name="datas">Data to insert</param>
         /// <returns></returns>
-        public Task<int> Update<TabelClass>(params TabelClass[] datas)
-            where TabelClass : class, new()
+        public Task<int> Update<TableClass>(params TableClass[] datas)
+            where TableClass : class, new()
         {
-            // 审计信息
-            Type type = typeof(TabelClass);
+            // Audit
+            Type type = typeof(TableClass);
             if (type.IsAssignableTo(typeof(IModifyAudited)))
             {
                 foreach (var data in datas)
@@ -228,31 +234,31 @@ namespace System
                 }
             }
 
-            // 更新方法
+            // Update
             return _db.Updateable(datas).ExecuteCommandAsync();
         }
 
         /// <summary>
-        /// 更新数据
+        /// Update data
         /// </summary>
-        /// <typeparam name="TabelClass">表数据类</typeparam>
-        /// <param name="target">目标字段</param>
-        /// <param name="condition">更新条件</param>
+        /// <typeparam name="TableClass">Table</typeparam>
+        /// <param name="target">Fields to updates</param>
+        /// <param name="condition">Update condition</param>
         /// <returns></returns>
-        public Task<int> Update<TabelClass>(object target, Expression<Func<TabelClass, bool>> condition)
-            where TabelClass : class, new()
+        public Task<int> Update<TableClass>(object target, Expression<Func<TableClass, bool>> condition)
+            where TableClass : class, new()
         {
             if (target is null)
                 return Task.FromResult(0);
 
-            // 生成更新字典
+            // Make a new dictionary
             var columnValues = target
                 .GetType()
                 .GetProperties()
                 .ToDictionary(p => p.Name, p => p.GetValue(target));
 
-            Type type = typeof(TabelClass);
-            // 审计信息
+            Type type = typeof(TableClass);
+            // Audit
             if (type.IsAssignableTo(typeof(IModifyAudited)))
             {
                 if (User != null)
@@ -260,8 +266,8 @@ namespace System
                 columnValues["LastModificationTime"] = DateTime.Now;
             }
 
-            // 更新方法
-            return _db.Updateable<TabelClass>(columnValues)
+            // Update
+            return _db.Updateable<TableClass>(columnValues)
                 .Where(condition)
                 .ExecuteCommandAsync();
         }
@@ -269,34 +275,34 @@ namespace System
 
         #region Delete
         /// <summary>
-        /// 删除数据
+        /// Deletion
         /// </summary>
-        /// <typeparam name="TabelClass">表数据类</typeparam>
-        /// <param name="ids">主键ID集合</param>
+        /// <typeparam name="TableClass">Table</typeparam>
+        /// <param name="ids">Key ids</param>
         /// <returns></returns>
-        public Task<bool> Delete<TabelClass>(params int[] ids)
-            where TabelClass : class, new()
+        public Task<bool> Delete<TableClass>(params int[] ids)
+            where TableClass : class, new()
         {
-            Type type = typeof(TabelClass);
+            Type type = typeof(TableClass);
 
             if (type.IsAssignableTo(typeof(IDeletionAudited)))
-                return _db.Updateable<TabelClass>(new { DeletedTime = DateTime.Now, DeleterId = User?.Id ?? 0 }).Where("Id IN (" + String.Join(",", ids.Select(key => "'" + key + "'")) + ")").ExecuteCommandHasChangeAsync();
+                return _db.Updateable<TableClass>(new { DeletedTime = DateTime.Now, DeleterId = User?.Id ?? 0 }).Where("Id IN (" + String.Join(",", ids.Select(key => "'" + key + "'")) + ")").ExecuteCommandHasChangeAsync();
             else if (type.IsAssignableTo(typeof(ISoftDelete)))
-                return _db.Updateable<TabelClass>(new { DeletedTime = DateTime.Now }).Where("Id IN (" + String.Join(",", ids.Select(key => "'" + key + "'")) + ")").ExecuteCommandHasChangeAsync();
+                return _db.Updateable<TableClass>(new { DeletedTime = DateTime.Now }).Where("Id IN (" + String.Join(",", ids.Select(key => "'" + key + "'")) + ")").ExecuteCommandHasChangeAsync();
             else
-                return _db.Deleteable<TabelClass>().Where("Id IN (" + String.Join(",", ids.Select(key => "'" + key + "'")) + ")").ExecuteCommandHasChangeAsync();
+                return _db.Deleteable<TableClass>().Where("Id IN (" + String.Join(",", ids.Select(key => "'" + key + "'")) + ")").ExecuteCommandHasChangeAsync();
         }
 
         /// <summary>
-        /// 删除数据
+        /// Deletion
         /// </summary>
-        /// <typeparam name="TabelClass">表数据类</typeparam>
-        /// <param name="condition">条件表达式</param>
+        /// <typeparam name="TableClass">Table</typeparam>
+        /// <param name="condition">Deletion condition</param>
         /// <returns></returns>
-        public Task<bool> Delete<TabelClass>(Expression<Func<TabelClass, bool>> condition)
-            where TabelClass : class, new()
+        public Task<bool> Delete<TableClass>(Expression<Func<TableClass, bool>> condition)
+            where TableClass : class, new()
         {
-            Type type = typeof(TabelClass);
+            Type type = typeof(TableClass);
 
             var list = new List<IConditionalModel>();
             if (type.IsAssignableTo(typeof(ISoftDelete)))
@@ -308,22 +314,22 @@ namespace System
                 });
             }
             if (type.IsAssignableTo(typeof(IDeletionAudited)))
-                return _db.Updateable<TabelClass>(new { DeletedTime = DateTime.Now, DeleterId = User?.Id ?? 0 }).Where(list).Where(condition).ExecuteCommandHasChangeAsync();
+                return _db.Updateable<TableClass>(new { DeletedTime = DateTime.Now, DeleterId = User?.Id ?? 0 }).Where(list).Where(condition).ExecuteCommandHasChangeAsync();
             else if (type.IsAssignableTo(typeof(ISoftDelete)))
-                return _db.Updateable<TabelClass>(new { DeletedTime = DateTime.Now }).Where(list).Where(condition).ExecuteCommandHasChangeAsync();
+                return _db.Updateable<TableClass>(new { DeletedTime = DateTime.Now }).Where(list).Where(condition).ExecuteCommandHasChangeAsync();
             else
-                return _db.Deleteable<TabelClass>().Where(condition).ExecuteCommandHasChangeAsync();
+                return _db.Deleteable<TableClass>().Where(condition).ExecuteCommandHasChangeAsync();
         }
         #endregion
 
         #region Exception
         /// <summary>
-        /// 抛出异常
+        /// Throw the exceptions
         /// </summary>
         /// <param name="exception"></param>
         private void ThrowException(Exception exception)
         {
-            // 抛出
+            // Throw set
             _exception = exception;
             Dispose();
         }
@@ -343,7 +349,7 @@ namespace System
         /// Get client.
         /// </summary>
         /// <param name="db"></param>
-        public static explicit operator SqlSugarScope(AppDB db) => db._db;
+        public static explicit operator SqlSugarClient(AppDB db) => db._db;
 
         #region Dispose
         protected virtual void Dispose(bool disposing)
@@ -354,39 +360,29 @@ namespace System
                 {
                     if (_doTran)
                     {
-                        // TODO: 释放托管状态(托管对象)
+                        // TODO: Dispose
                         if (_exception is null)
                         {
-                            // 提交事务
+                            // Commit
                             _db.CommitTran();
                         }
                         else
                         {
-                            // 事务回滚
+                            // Rollback
                             _db.RollbackTran();
                         }
                     }
 
-                    // 释放客户端
+                    // Dispose
                     _db.Dispose();
                 }
 
-                // TODO: 释放未托管的资源(未托管的对象)并重写终结器
-                // TODO: 将大型字段设置为 null
                 disposedValue = true;
             }
         }
 
-        // // TODO: 仅当“Dispose(bool disposing)”拥有用于释放未托管资源的代码时才替代终结器
-        // ~AppDB()
-        // {
-        //     // 不要更改此代码。请将清理代码放入“Dispose(bool disposing)”方法中
-        //     Dispose(disposing: false);
-        // }
-
         public void Dispose()
         {
-            // 不要更改此代码。请将清理代码放入“Dispose(bool disposing)”方法中
             Dispose(disposing: true);
             GC.SuppressFinalize(this);
         }
