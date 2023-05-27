@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 namespace System
 {
     /// <summary>
-    /// 用户资源服务接口
+    /// UserManagement
     /// </summary>
-    [Description("用户资源服务接口")]
+    [Description("UserManagement")]
     public interface IAccountService
     {
         /// <summary>
@@ -24,11 +24,5 @@ namespace System
         /// </summary>
         [Description("Register")]
         Task<bool> Register(RegisterInput user);
-
-        /// <summary>
-        /// UserInfo
-        /// </summary>
-        [Description("UserInfo")]
-        Task<IdentityUser> GetUserAsync(string username);
     }
 }

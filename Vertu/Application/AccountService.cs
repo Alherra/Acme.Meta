@@ -42,9 +42,5 @@ namespace System
                 user.Password = _encrypter.Encrypt(user.Password, "^" + user.UserName);
                 return await db.Insert(user.MapTo<IdentityUser>());
             });
-
-        [Description("UserInfo")]
-        public Task<IdentityUser> GetUserAsync(string username)
-            => AppDB.Execute(async db => await db.Queryable<IdentityUser>().SingleAsync(x => x.UserName == username));
     }
 }
