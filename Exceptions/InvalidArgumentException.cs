@@ -8,24 +8,24 @@ using System.Threading.Tasks;
 namespace System
 {
     /// <summary>
-    /// 无效参数异常
+    /// InvalidArgument
     /// </summary>
-    [Description("无效参数异常")]
+    [Description("InvalidArgument")]
     internal class InvalidArgumentException : Exception
     {
         /// <summary>
-        /// 无效参数异常
+        /// InvalidArgument
         /// </summary>
         /// <param name="message"></param>
-        [Description("无效参数异常")]
+        [Description("InvalidArgument")]
         public InvalidArgumentException(string message) : base(message) { }
 
         /// <summary>
-        /// 无效参数异常
+        /// InvalidArgument
         /// </summary>
         /// <param name="message"></param>
         /// <param name="innerException"></param>
-        [Description("无效参数异常")]
+        [Description("InvalidArgument")]
         public InvalidArgumentException(string message, Exception? innerException) : base(message, innerException) { }
     }
 }

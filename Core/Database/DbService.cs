@@ -106,7 +106,7 @@ namespace System
             foreach (var pv in p)
                 s = s.Replace(pv.ParameterName, "\"" + pv.Value + "\"");
 
-            MetaLogger.Db(s);
+            AppLogger.Db(s);
         }
     }
 }

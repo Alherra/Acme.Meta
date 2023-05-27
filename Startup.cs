@@ -50,7 +50,7 @@ namespace System
                             foreach (var pv in p)
                                 sql = sql.Replace(pv.ParameterName, "\"" + pv.Value + "\"");
 
-                            MetaLogger.Db(sql);
+                            ServiceProvider.GetService<AppLogger>()?.Db(sql);
                         };
                         //设置更多连接参数
                         //db.CurrentConnectionConfig.XXXX=XXXX
@@ -93,6 +93,7 @@ namespace System
         [Description("DependencyInject")]
         private static IServiceCollection AutoInjection(this IServiceCollection serviceCollection)
         {
+            serviceCollection.TryAddSingleton<AppLogger>();
             serviceCollection.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             serviceCollection.TryAddScoped<IAccountService, AccountService>();
             serviceCollection.TryAddSingleton<IEncrypter, Encrypter>();

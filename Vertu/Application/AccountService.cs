@@ -21,9 +21,6 @@ namespace System
         public Task<IdentityUser> SignIn(string account, string pwd)
             => AppDB.Execute(async db =>
             {
-                if (CurrentUser != null && CurrentUser.Id > 0)
-                    throw new ArgumentException(message: "Already logged!");
-
                 var password = _encrypter.Encrypt(pwd, "^" + account);
                 var user = await db.Queryable<IdentityUser>().SingleAsync(x => x.UserName == account);
                 if (!user.Password.Equals(password))

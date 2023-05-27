@@ -8,24 +8,24 @@ using System.Threading.Tasks;
 namespace System
 {
     /// <summary>
-    /// Authorize Error
+    /// Frequency Error
     /// </summary>
-    [Description("Authorize Error")]
-    public class AuthorizeException : Exception
+    [Description("Frequency Error")]
+    public class FrequencyException : Exception
     {
         /// <summary>
-        /// Authorize Error
+        /// Frequency Error
         /// </summary>
         /// <param name="message"></param>
-        [Description("Authorize Error")]
-        public AuthorizeException(string message) : base(message) { }
+        [Description("Frequency Error")]
+        public FrequencyException(string message) : base(message) { }
 
         /// <summary>
-        /// Authorize Error
+        /// Frequency Error
         /// </summary>
         /// <param name="message"></param>
         /// <param name="innerException"></param>
-        [Description("Authorize Error")]
-        public AuthorizeException(string message, Exception? innerException) : base(message, innerException) { }
+        [Description("Frequency Error")]
+        public FrequencyException(string message, Exception? innerException) : base(message, innerException) { }
     }
 }

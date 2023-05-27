@@ -8,24 +8,24 @@ using System.Threading.Tasks;
 namespace System
 {
     /// <summary>
-    /// 业务逻辑异常
+    /// Normal Error
     /// </summary>
-    [Description("业务逻辑异常")]
+    [Description("Normal Error")]
     public class BussinessException : Exception
     {
         /// <summary>
-        /// 业务逻辑异常
+        /// Normal Error
         /// </summary>
         /// <param name="message"></param>
-        [Description("业务逻辑异常")]
+        [Description("Normal Error")]
         public BussinessException(string message) : base(message) { }
 
         /// <summary>
-        /// 业务逻辑异常
+        /// Normal Error
         /// </summary>
         /// <param name="message"></param>
         /// <param name="innerException"></param>
-        [Description("业务逻辑异常")]
+        [Description("Normal Error")]
         public BussinessException(string message, Exception? innerException) : base(message, innerException) { }
     }
 }

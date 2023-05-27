@@ -27,7 +27,6 @@ namespace System
         [Description("配置异常信息")]
         public static void MapError(this ActionExecutingContext context, StatusCode status, string message, string details, string code = "")
         {
-            DbScoped.SugarScope.RollbackTran();
             context.Result = new JsonResult(new
             {
                 Error = new
@@ -46,16 +45,15 @@ namespace System
         /// 配置异常信息
         /// </summary>
         [Description("配置异常信息")]
-        public static void MapError(this ActionExecutedContext context, StatusCode status, string code = "")
+        public static void MapError(this ActionExecutedContext context, StatusCode status, string message = "", string details = "", string code = "")
         {
-            DbScoped.SugarScope.RollbackTran();
             context.Result = new JsonResult(new
             {
                 Error = new
                 {
                     Code = string.IsNullOrEmpty(code) ? status.ToString() : code,
-                    context.Exception.Message,
-                    Details = context.Exception.ToString()
+                    Message = string.IsNullOrEmpty(message) ?  message : context.Exception.Message,
+                    Details = string.IsNullOrEmpty(details) ? details : context.Exception.ToString()
                 }
             });
             context.HttpContext.Response.StatusCode = (int)status;
@@ -69,7 +67,6 @@ namespace System
         [Description("配置异常信息")]
         public static void MapError(this AuthorizationFilterContext context, StatusCode status, string message, string details, string code = "")
         {
-            DbScoped.SugarScope.RollbackTran();
             context.Result = new JsonResult(new
             {
                 Error = new
