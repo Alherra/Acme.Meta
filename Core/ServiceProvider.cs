@@ -12,12 +12,12 @@ namespace System
         /// <summary>
         /// Http Context
         /// </summary>
-        public static HttpContext HttpContext => Activator.CreateInstance<HttpContextAccessor>().HttpContext;
+        public static HttpContext? HttpContext => Activator.CreateInstance<HttpContextAccessor>()?.HttpContext;
 
         /// <summary>
         /// IServiceProvider
         /// </summary>
-        public static IServiceProvider Instance => HttpContext.Features.Get<IServiceProvidersFeature>()?.RequestServices!;
+        public static IServiceProvider? Instance => HttpContext?.Features?.Get<IServiceProvidersFeature>()?.RequestServices;
 
         /// <summary>
         /// Get instance for service.

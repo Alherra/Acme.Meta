@@ -1,14 +1,8 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using SqlSugar.IOC;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace System
 {
@@ -26,46 +20,8 @@ namespace System
         [Description("Start Meta")]
         public static IServiceCollection RunMeta(this IServiceCollection services)
         {
-            #region SqlSugar Ioc
-
-            var connectionString = AppSetting.Get("ConnectionStrings.Default");
-            if (!string.IsNullOrEmpty(connectionString))
-            {
-                var dbType = AppSetting.Get("ConnectionStrings.DbType");
-                if (!string.IsNullOrEmpty(dbType))
-                {
-                    // Inject ORM
-                    services.AddSqlSugar(new IocConfig()
-                    {
-                        ConnectionString = connectionString,
-                        DbType = (IocDbType)Enum.Parse(typeof(IocDbType), dbType),
-                        IsAutoCloseConnection = false
-                    });
-
-                    // Config orm
-                    services.ConfigurationSugar(db =>
-                    {
-                        db.Aop.OnLogExecuting = (sql, p) =>
-                        {
-                            foreach (var pv in p)
-                                sql = sql.Replace(pv.ParameterName, "\"" + pv.Value + "\"");
-
-                            ServiceProvider.GetService<AppLogger>()?.Db(sql);
-                        };
-                        //设置更多连接参数
-                        //db.CurrentConnectionConfig.XXXX=XXXX
-                        //db.CurrentConnectionConfig.MoreSetting=new MoreSetting(){}
-                        //读写分离等都在这儿设置
-                    });
-                }
-            }
-            #endregion
-
             // DependencyInject
             services.AutoInjection();
-
-            // Init database tables
-            services.InitSugarTables();
 
             // Config redis
             if (!string.IsNullOrEmpty(AppSetting.Get("Redis.Configuration")))
@@ -80,6 +36,8 @@ namespace System
                     };
                 });
             }
+
+            Task.Run(InitSugarTables);
             return services;
         }
 
@@ -140,25 +98,28 @@ namespace System
         /// <param name="services"></param>
         /// <returns></returns>
         [Description("Refresh tables")]
-        private static IServiceCollection InitSugarTables(this IServiceCollection services)
+        private static async void InitSugarTables()
         {
-            Task.Run(() =>
+            try
             {
-                try
+                Thread.Sleep(1000);
+                await AppDB.Execute(async db =>
                 {
                     var tables = Directory.GetFiles(AppContext.BaseDirectory, "*.dll")
                         .Select(Assembly.LoadFrom)
                         .SelectMany(a => a.GetTypes())
                         .Where(t => t.CustomAttributes != null && t.CustomAttributes.Any(a => a.AttributeType.Name == "SugarTable"))
                         .ToArray();
-                    DbScoped.SugarScope.CodeFirst.InitTables(tables);
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine(ex);
-                }
-            });
-            return services;
+                    ((SqlSugar.SqlSugarClient)db).CodeFirst.InitTables(tables);
+
+                    return await Task.FromResult(true);
+                });
+            }
+            catch
+            {
+                var task = Task.Run(InitSugarTables);
+            }
         }
+
     }
 }

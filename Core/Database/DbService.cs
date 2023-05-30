@@ -31,7 +31,7 @@ namespace System
             DbType = (DbType)Enum.Parse(typeof(DbType), Type),
             IsAutoCloseConnection = true,
             InitKeyType = InitKeyType.Attribute
-        });
+        }, db => db.Aop.OnLogExecuting = (s, p) => ExecutingLog(s, p));
 
         /// <summary>
         /// Scope
@@ -42,14 +42,7 @@ namespace System
             DbType = (DbType)Enum.Parse(typeof(DbType), Type),
             ConnectionString = Connection,
             IsAutoCloseConnection = true
-        },
-            db =>
-            {
-                db.Aop.OnLogExecuting = (s, p) =>
-                {
-                    ExecutingLog(s, p);
-                };
-            });
+        }, db => db.Aop.OnLogExecuting = (s, p) => ExecutingLog(s, p));
 
         /// <summary>
         /// Engine
@@ -60,14 +53,7 @@ namespace System
             DbType = (DbType)Enum.Parse(typeof(DbType), Type),
             ConnectionString = Connection,
             IsAutoCloseConnection = true
-        },
-            db =>
-            {
-                db.Aop.OnLogExecuting = (s, p) =>
-                {
-                    ExecutingLog(s, p);
-                };
-            });
+        }, db => db.Aop.OnLogExecuting = (s, p) => ExecutingLog(s, p));
 
         /// <summary>
         /// Logger
@@ -80,7 +66,8 @@ namespace System
             foreach (var pv in p)
                 s = s.Replace(pv.ParameterName, "\"" + pv.Value + "\"");
 
-            ServiceProvider.GetService<AppLogger>()?.Db(s);
+            var logger = ServiceProvider.GetService<AppLogger>();
+            if (logger != null) logger.Db(s);
         }
     }
 }
