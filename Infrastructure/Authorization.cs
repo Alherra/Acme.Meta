@@ -47,7 +47,7 @@ namespace System
                     context.MapError(StatusCode.UnAuthorize, "State Un-Login", "Loginned Required");
                     return;
                 }
-                if (!string.IsNullOrEmpty(Policy) && !DbService.QueryScope.Queryable<UserOption>().Any(x => x.UserId == user.Id && x.Policy == Policy))
+                if (!string.IsNullOrEmpty(Policy) && !ServiceProvider.GetService<ISugarDB>()!.Scope.Queryable<UserOption>().Any(x => x.UserId == user.Id && x.Policy == Policy))
                 {
                     context.MapError(StatusCode.Forbidden, "None Permission", "User Authorize Limited");
                     return;

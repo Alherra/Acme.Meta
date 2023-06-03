@@ -20,7 +20,7 @@ namespace System
         /// <summary>
         /// Sugar Client
         /// </summary>
-        private readonly SqlSugarClient _db = DbService.Client;
+        private readonly SqlSugarClient _db = ServiceProvider.GetService<ISugarDB>()?.Client!;
 
         private UserInfo? _user;
 

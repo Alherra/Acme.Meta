@@ -7,67 +7,79 @@ namespace System
     /// MetaDB
     /// </summary>
     [Description("MetaDB")]
-    public class DbService
+    internal class DbService : ISugarDB
     {
         /// <summary>
         /// ConnectionStrings
         /// </summary>
         [Description("ConnectionStrings")]
-        private readonly static string Connection = AppSetting.Get("ConnectionStrings.Default");
+        private readonly string Connection = AppSetting.Get("ConnectionStrings.Default");
 
         /// <summary>
         /// DbType
         /// </summary>
         [Description("DbType")]
-        private readonly static string Type = AppSetting.Get("ConnectionStrings.DbType");
+        private readonly string Type = AppSetting.Get("ConnectionStrings.DbType");
 
         /// <summary>
-        /// Client
+        /// ConnectionConfig
         /// </summary>
-        [Description("Client")]
-        public static SqlSugarClient Client => new(new ConnectionConfig()
-        {
-            ConnectionString = Connection,
-            DbType = (DbType)Enum.Parse(typeof(DbType), Type),
-            IsAutoCloseConnection = true,
-            InitKeyType = InitKeyType.Attribute
-        }, db => db.Aop.OnLogExecuting = (s, p) => ExecutingLog(s, p));
+        [Description("ConnectionConfig")]
+        private readonly ConnectionConfig _config;
 
         /// <summary>
         /// Scope
         /// </summary>
         [Description("Scope")]
-        public static readonly SqlSugarScope Db = new(new ConnectionConfig() 
-        {
-            DbType = (DbType)Enum.Parse(typeof(DbType), Type),
-            ConnectionString = Connection,
-            IsAutoCloseConnection = true
-        }, db => db.Aop.OnLogExecuting = (s, p) => ExecutingLog(s, p));
+        private readonly SqlSugarScope _scope;
 
         /// <summary>
-        /// Engine
+        /// AppLogger
         /// </summary>
-        [Description("Engine")]
-        public static SqlSugarScope QueryScope => new(new ConnectionConfig()
+        [Description("AppLogger")]
+        private readonly AppLogger _logger;
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        [Description("Constructor")]
+        public DbService(AppLogger logger)
         {
-            DbType = (DbType)Enum.Parse(typeof(DbType), Type),
-            ConnectionString = Connection,
-            IsAutoCloseConnection = true
-        }, db => db.Aop.OnLogExecuting = (s, p) => ExecutingLog(s, p));
+            _logger = logger;
+            _config = new ConnectionConfig()
+            {
+                DbType = (DbType)Enum.Parse(typeof(DbType), Type),
+                ConnectionString = Connection,
+                IsAutoCloseConnection = true,
+                InitKeyType = InitKeyType.Attribute
+            };
+            _scope = new(_config, db => db.Aop.OnLogExecuting = (s, p) => ExecutingLog(s, p));
+        }
+
+        /// <summary>
+        /// Client
+        /// </summary>
+        [Description("Client")]
+        public SqlSugarClient Client => new(_config, db => db.Aop.OnLogExecuting = (s, p) => ExecutingLog(s, p));
+
+        /// <summary>
+        /// Scope
+        /// </summary>
+        [Description("Scope")]
+        public SqlSugarScope Scope => _scope;
 
         /// <summary>
         /// Logger
         /// </summary>
-        /// <param name="s">Sql</param>
-        /// <param name="p">Params</param>
+        /// <param name="sql">Sql</param>
+        /// <param name="parms">Params</param>
         [Description("Logger")]
-        static void ExecutingLog(string s, SugarParameter[] p)
+        void ExecutingLog(string sql, SugarParameter[] parms)
         {
-            foreach (var pv in p)
-                s = s.Replace(pv.ParameterName, "\"" + pv.Value + "\"");
+            foreach (var pv in parms)
+                sql = sql.Replace(pv.ParameterName, "\"" + pv.Value + "\"");
 
-            var logger = ServiceProvider.GetService<AppLogger>();
-            if (logger != null) logger.Db(s);
+            _logger?.Db(sql);
         }
     }
 }

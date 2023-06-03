@@ -1693,7 +1693,7 @@ namespace Microsoft.AspNetCore.Mvc.Core
 
         private static string GetString(string name, params string[] formatterNames)
         {
-            string text = _resourceManager.GetString(name);
+            string text = _resourceManager.GetString(name) ?? string.Empty;
             if (formatterNames != null)
             {
                 for (int i = 0; i < formatterNames.Length; i++)

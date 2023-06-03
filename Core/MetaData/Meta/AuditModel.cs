@@ -10,7 +10,7 @@ namespace System
     /// <summary>
     /// Audit base
     /// </summary>
-    public abstract class AuditModel : Meta<int>, ICreationAudited, IModifyAudited, IDeletionAudited
+    public abstract class AuditModel : Meta<int>, IMultiTenant, ICreationAudited, IModifyAudited, IDeletionAudited
     {
         [SugarColumn(ColumnDescription = "CreatorId")]
         public int CreatorId { get; set; }
@@ -29,5 +29,8 @@ namespace System
 
         [SugarColumn(ColumnDescription = "DeletedTime", IsNullable = true)]
         public DateTime? DeletedTime { get; set; }
+
+        [SugarColumn(ColumnDescription = "TenantId", IsNullable = true)]
+        public int TenantId { get; set; }
     }
 }

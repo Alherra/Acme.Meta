@@ -17,6 +17,6 @@ namespace System
         /// Id of the related tenant.
         /// </summary>
         [Description("Id of the related tenant.")]
-        int TenantId { get; }
+        int TenantId { get; set; }
     }
 }
